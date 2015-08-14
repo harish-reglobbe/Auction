@@ -8,7 +8,7 @@ use dosamigos\datepicker\DatePicker;
 /* @var $searchModel frontend\models\forms\AuctionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Auctions';
+$this->title = 'Dealer Auctions';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="auctions-index">
@@ -22,35 +22,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-//            'name',
-//            [
-//                'header' => 'Start Date',
-//                'value' => function($model){
-//                    return date("d M Y",  strtotime($model->start_date));
-//                },
-//                'filter' => DatePicker::widget([
-//                    'model' => $searchModel,
-//                    'attribute' => 'start_date',
-//                    'template' => '{addon}{input}',
-//                    'clientOptions' => [
-//                        'autoclose' => true,
-//                        'format' => 'yyyy-dd-mm',
-//                        'disableEntry'=>true,
-//                    ],
-//                    'options' => [
-//                        'readonly' => true
-//                    ]
-//                ])
-//            ],
+            'auction0.name',
+            [
+                'header' => 'Start Date',
+                'value' => 'auction0.start_date',
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'create_date',
+                    'template' => '{addon}{input}',
+                    'clientOptions' => [
+                        'format' => 'yyyy-dd-mm',
+                    ],
+                    'options' => [
+                        'readonly' => true
+                    ]
+                ])
+            ],
 //          //  'duration',
-//            'amount',
-//            [
-//                'header' => 'Company Name',
-//                'value' => 'companies.name',
-//                'filter' => Html::activeTextInput($searchModel, 'company',['class'=>'form-control'])
-//            ],
-//            'status',
-//            'priority',
+            'amount',
+            'status',
+            'auction0.amount'
         ],
     ]); ?>
 

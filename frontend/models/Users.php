@@ -188,4 +188,9 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**---Dealer Role */
+    public function getDealers(){
+       return $this->hasOne(Dealers::className(),['id' => 'id']);
+    }
 }

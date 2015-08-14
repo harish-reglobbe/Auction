@@ -12,6 +12,8 @@ use yii\data\ActiveDataProvider;
  */
 class DealerAuctionSearchForm extends DealerAuctions
 {
+
+
     /**
      * @inheritdoc
      */
@@ -42,7 +44,9 @@ class DealerAuctionSearchForm extends DealerAuctions
      */
     public function search($params)
     {
-        $query = DealerAuctions::find();
+        $query = DealerAuctions::find()->with([
+            'auction0'
+        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

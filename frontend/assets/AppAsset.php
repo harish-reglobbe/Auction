@@ -18,12 +18,10 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/site.css',
+        'css/templatemo_main.css',
     ];
     public $js = [
     ];
     public $depends = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
     ];
 }

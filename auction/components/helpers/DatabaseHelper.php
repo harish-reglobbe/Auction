@@ -22,6 +22,9 @@ class DatabaseHelper
     const ACTIVE=1;
     const IN_ACTIVE=0;
 
+    const EMAIL_TOKEN_VALID_TIME='+ 24 hour';
+    const SMS_TOKEN_VALID_TIME= '+1 hour';
+
     public static function UserRole($isShownAdmin=false){
 
         $roles=[
@@ -57,6 +60,14 @@ class DatabaseHelper
         }
 
         return $statusValue;
+    }
+
+    public static function TokenSendingOption(){
+
+        return [
+            'email' =>'Email',
+            'sms' => 'SMS'
+        ];
     }
 
 }

@@ -48,7 +48,7 @@ $config=[
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'formatter' => [ 'class' => 'yii\i18n\Formatter', 'datetimeFormat' => 'd-M-Y H:i:s', 'timeFormat' => 'H:i:s', 'nullDisplay' => '']
+        'formatter' => [ 'class' => 'yii\i18n\Formatter', 'datetimeFormat' => 'Y-MM-dd hh:i:s', 'timeFormat' => 'H:i:s', 'nullDisplay' => '']
     ]
 ];
 $config['components']=array_merge($config['components'],$components);

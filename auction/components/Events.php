@@ -16,4 +16,6 @@ class Events extends Event{
 
     const CREATE_COMPANY='create_company';
 
+    const USER_LOGIN='user_login';
+
 }

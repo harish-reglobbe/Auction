@@ -7,7 +7,7 @@
  */
 
 return [
-    'mail' => [
+    'mailer' => [
         'class' => 'yii\swiftmailer\Mailer',
         'viewPath' => '@auction/mail',
         'useFileTransport' => false,//set this property to false to send mails to real email addresses

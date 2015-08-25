@@ -9,6 +9,7 @@ $params = array_merge(
 return [
     'id' => 'app-auction',
     'basePath' => dirname(__DIR__),
+    'name' => 'Reglobe : Auction',
     'controllerNamespace' => 'auction\controllers',
     'defaultRoute' => 'site/index',
     'aliases' => [

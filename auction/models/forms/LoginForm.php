@@ -6,6 +6,7 @@ use auction\components\Auction;
 use Yii;
 use yii\base\Model;
 use auction\models\Users;
+use auction\components\Events;
 
 /**
  * Login form
@@ -80,6 +81,9 @@ class LoginForm extends Model
             if($user->company !== null){
                 Auction::$app->session->set('user.company',$user->company->id);
             }
+
+            //Trigger User Login Event
+            $user->trigger(Events::USER_LOGIN);
 
             return Auction::$app->user->login($user, $this->rememberMe ? 3600 * 24 * 30 : 0);
         } else {

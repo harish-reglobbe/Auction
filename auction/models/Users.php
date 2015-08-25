@@ -2,11 +2,14 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
 use Yii;
 use common\models\User;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use auction\components\helpers\DatabaseHelper;
+use auction\components\Events;
+use auction\components\EventHandler;
 
 /**
  * This is the model class for table "{{%users}}".
@@ -40,6 +43,13 @@ class Users extends User
     {
         return '{{%users}}';
     }
+
+
+    public function init(){
+        //User Login Event handler
+        $this->on(Events::USER_LOGIN, [EventHandler::className(), 'UserLogin']);
+    }
+
 
     public function behaviors()
     {
@@ -183,4 +193,17 @@ class Users extends User
     {
         return static::findOne(['id' => $id, 'is_active' => DatabaseHelper::ACTIVE]);
     }
+
+    /**  Last Reset Password token of user */
+    public function getToken(){
+
+       return $this->hasOne(ForgotPasswordHistory::className(),['user' => 'id'])
+           ->where(
+               'valid_till >=NOW() and status=:status'
+               ,[':status' => DatabaseHelper::ACTIVE])
+           ->orderBy('create_date desc')->limit(1);
+
+    }
+
+
 }

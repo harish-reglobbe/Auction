@@ -57,7 +57,7 @@ class DealerRegistration extends Model{
 
     /**
      * trigger Event Assigned on Events::CREATE_DEALER
-     * Events Defined In frontened/components/Events
+     * Events Defined In auction/components/Events
      */
     public function afterValidate(){
         $this->trigger(Events::CREATE_DEALER);

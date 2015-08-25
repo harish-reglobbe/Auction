@@ -7,6 +7,8 @@ use auction\models\forms\LoginForm;
 
 class LoginController extends \yii\web\Controller
 {
+    public $layout='login';
+
     public function actionIndex()
     {
         if (!Auction::$app->user->isGuest) {

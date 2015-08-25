@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace backend\assets;
+namespace auction\assets;
 
 use yii\web\AssetBundle;
 
@@ -17,13 +17,23 @@ class AppAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
+
     public $css = [
-        'css/site.css',
+      //  'css/site.css',
+        'css/metisMenu.min.css',
+        'css/bootstrap.min.css',
+      //  'css/morris.css',
+        'css/sb-admin-2.css',
+        'css/font-awesome.min.css'
     ];
+
     public $js = [
+        'js/metisMenu.js',
+        'js/sb-admin-2.js',
+        'js/bootstrap.min.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+       // 'yii\bootstrap\BootstrapAsset',
     ];
 }

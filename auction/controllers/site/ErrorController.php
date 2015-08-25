@@ -3,7 +3,9 @@
 namespace auction\controllers\site;
 
 use auction\components\Auction;
+use yii\base\UnknownMethodException;
 use yii\web\ErrorAction;
+use yii\console\ErrorHandler;
 
 class ErrorController extends \yii\web\Controller
 {

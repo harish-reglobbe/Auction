@@ -1,0 +1,187 @@
+<?php
+
+namespace auction\models;
+
+use common\components\JAPI;
+use Yii;
+use yii\helpers\Json;
+
+/**
+ * This is the model class for collection "products".
+ *
+ * @property \MongoId|string $_id
+ * @property mixed $id
+ * @property mixed $product_id
+ * @property mixed $name
+ * @property mixed $image
+ * @property mixed $brand_id
+ * @property mixed $cat_id
+ * @property mixed $lot_id
+ * @property mixed $prize
+ * @property mixed $condition
+ * @property mixed $extra_cond
+ * @property mixed $create_date
+ */
+class Products extends \yii\mongodb\ActiveRecord
+{
+    public $productCSV=null;
+    private $_request;
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function collectionName()
+    {
+        return ['auction', 'products'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributes()
+    {
+        return [
+            '_id',
+            'id',
+            'product_id',
+            'name',
+            'image',
+            'brand_id',
+            'cat_id',
+            'lot_id',
+            'prize',
+            'condition',
+            'extra_cond',
+            'create_date',
+        ];
+    }
+
+    //"pn":"Product","img":"Image path","bi":Brand Id,"ci":CategoryId,"pri":Price,"c":"Condition","ec":"ExtraCondition"
+    static $APIMask=['pn', 'img', 'bi', 'ci', 'pri', 'c', 'ec'];
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'brand_id', 'cat_id', 'lot_id', 'prize'], 'required'],
+            //['image' , 'file' ,'skipOnEmpty' => false],
+            ['productCSV', 'file', 'extensions' => ['csv'], 'maxSize' => 1024*1024 ],
+            [[ 'condition', 'extra_cond'], 'safe']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'product_id' => 'Id',
+            'name' => 'Name',
+            'image' => 'Image',
+            'brand_id' => 'Brand',
+            'cat_id' => 'Category',
+            'lot_id' => 'Lot',
+            'prize' => 'Prize',
+            'condition' => 'Condition',
+            'extra_cond' => 'Extra Condition',
+        ];
+    }
+
+
+    /**  Save Product Model**/
+    public function save($runValidation = true, $attributeNames = null){
+
+        parent::save($runValidation,$attributeNames);
+
+        $client = new JAPI();
+        $response=$client->process('http://http://192.168.1.42:8080/api',JAPI::HTTP_METHOD_GET,$this->_request);
+        dump($response);
+
+    }
+
+    /**  Delete Models **/
+    public static function deleteAll($condition = [], $options = []){
+
+        //new HttpGet(API_URL+"/users/otp.json?pid=Xi32jNW0&pid=jl2S7dLp&pid=ycQOmNA3");
+        $url='http://192.168.1.126:8080/api/product.json?';
+
+        if(is_string($condition)){
+            $url.='pid='.$condition;
+        }
+        elseif(is_array($condition)){
+            foreach($condition as $pId){
+                $url.='pid='.$pId.'&';
+            }
+
+            $url=substr($url,0,-1);
+        }
+
+        $client = new JAPI();
+        $response=$client->process($url,JAPI::HTTP_METHOD_DELETE);
+        dump($response);
+
+    }
+
+
+    /**
+     * Upload CSV File
+     */
+    public function uploadCsvFile($data){
+
+        $model = new Products();
+        $products=[];
+
+        foreach($data as $product){
+            $model->setAttributes($product);
+
+            if($model->validate()){
+                $products=array_combine(self::$APIMask,$product);
+            }
+        }
+
+        if(count($products) > 0){
+            $client = new JAPI();
+            $response=$client->process('http://http://192.168.1.42:8080/api',JAPI::HTTP_METHOD_GET,$products);
+            dump($response);
+        }
+    }
+
+    public function getCategory0(){
+        return $this->hasOne(Categories::className(),['id' => 'cat_id']);
+    }
+
+    public function getBrand0(){
+        return $this->hasOne(Brands::className(),['id' => 'brand_id']);
+    }
+
+    public function getLot0(){
+        return $this->hasOne(Lots::className(),['id' => 'lot_id']);
+    }
+
+    public function beforeSave($insert){
+        $this->doMasking();
+        return parent::beforeSave($insert);
+    }
+
+    private function doMasking(){
+        //'pn', 'img', 'bi', 'ci', 'pri', 'c', 'ec'
+        $_request=[];
+
+        $_request['pn']=$this->name;
+        $_request['img']=$this->image;
+        $_request['bi']=$this->brand;
+        $_request['ci']=$this->condition;
+        $_request['pri']=$this->prize;
+        $_request['c']=$this->condition;
+        $_request['ec']=$this->extra_condition;
+
+        $this->_request=Json::encode($_request);
+
+    }
+
+
+}

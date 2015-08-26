@@ -3,18 +3,21 @@
 namespace auction\controllers\company;
 
 use auction\components\Auction;
-use auction\components\helpers\AccessRule;
+use auction\models\Companies;
+use yii\web\HttpException;
 use yii\filters\AccessControl;
 use auction\components\helpers\DatabaseHelper;
-use auction\models\Companies;
+use auction\components\helpers\AccessRule;
 
-class InfoController extends \yii\web\Controller
+class UserProfileController extends \yii\web\Controller
 {
+
     //Behaviour to Apply Access Filtering
-   /* public function behaviors(){
+    public function behaviors(){
         return [
             'access' => [
                 'class' => AccessControl::className(),
+                // We will override the default rule config with the new AccessRule class
                 'ruleConfig' => [
                     'class' => AccessRule::className(),
                 ],
@@ -23,27 +26,26 @@ class InfoController extends \yii\web\Controller
                         'actions' => ['index'],
                         'allow' => true,
                         'roles' => [
-                            DatabaseHelper::COMPANY_ADMIN,
+                            DatabaseHelper::DEALER,
+                            DatabaseHelper::COMPANY_ADMIN
                         ],
                     ],
                 ],
             ],
         ];
-    }*/
+    }
 
     public function actionIndex()
     {
-        $model=$this->loadModel();
+        $model= $this->loadModel();
 
-        return $this->render('info',[
+        return $this->render('//company/user-profile',[
             'model' => $model
         ]);
     }
 
     /**
      * Get Company Info
-     *
-     * todo need to learn relational stat query worst method ever
      */
     protected function loadModel(){
 
@@ -51,26 +53,20 @@ class InfoController extends \yii\web\Controller
          * Load All Related Models Of Users
          * having userId is logged in dealer user Id
          */
-        $query= Companies::find()->with([
-            'user' =>function($query){
-                $query->andWhere(['id' => Auction::$app->user->id]);
-            },
-            'auctions' => function($query){
-                $query->asArray();
-            },
-            'companyUsers' => function($query){
-                $query->asArray();
+
+        $query= Companies::find()->joinWith([
+            'user' => function($query){
+                 $query->where([
+                    'users.id' => Auction::$app->user->id
+                ]);
             }
-        ])->where([
-            'id' => Auction::$app->session->get('user.company')
         ]);
 
         $model=$query->one();
 
         if($model === null){
-            throw new HttpException(400, 'Not a Valid Company');
+            throw new HttpException(400, 'Not a Valid Dealer');
         }
-
         return $model;
     }
 

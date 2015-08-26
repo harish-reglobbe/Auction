@@ -34,24 +34,41 @@ class ActionColumn extends \yii\grid\ActionColumn
 
     private function viewButton($url,$model){
 
-       return  Html::a('<span class="glyphicon glyphicon-eye-open"></span>', "#", [
+        return Html::button('<i class="fa fa-list"></i>',[
+            'class' => 'view-modal btn btn-primary btn-circle',
+            'data-id' => $model->primaryKey
+        ]);
+
+       /*return  Html::a('<span class="glyphicon glyphicon-eye-open"></span>', "#", [
            'class' => 'view-modal',
            'data-id' => $model->primaryKey,
-       ]);
+       ]);*/
 
    }
 
     private function deleteButton($url,$model){
-        return  Html::a('<span class="glyphicon glyphicon-trash"></span>', '#', [
+
+        return Html::button('<i class="fa fa-times"></i>',[
+            'class' => 'delete-modal btn btn-danger btn-circle',
+            'data-id' => $model->primaryKey
+        ]);
+
+        /*return  Html::a('<span class="glyphicon glyphicon-trash"></span>', '#', [
             'class' => 'delete-modal',
             'data-id' => $model->primaryKey,
-        ]);
+        ]);*/
     }
 
     private function updateButton($url,$model){
-        return  Html::a('<span class="glyphicon glyphicon-pencil"></span>', "#", [
+
+        return Html::button('<i class="fa fa-list"></i>',[
+            'class' => 'update-modal btn btn-info btn-circle',
+            'data-id' => $model->primaryKey
+        ]);
+
+        /*return  Html::a('<span class="glyphicon glyphicon-pencil"></span>', "#", [
             'class' => 'update-modal',
             'data-id' => $model->primaryKey,
-        ]);
+        ]);*/
     }
 }

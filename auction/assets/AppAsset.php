@@ -19,10 +19,10 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
 
     public $css = [
-      //  'css/site.css',
+        'css/timeline.css',
         'css/metisMenu.min.css',
         'css/bootstrap.min.css',
-      //  'css/morris.css',
+        'css/morris.css',
         'css/sb-admin-2.css',
         'css/font-awesome.min.css'
     ];
@@ -30,7 +30,9 @@ class AppAsset extends AssetBundle
     public $js = [
         'js/metisMenu.js',
         'js/sb-admin-2.js',
-        'js/bootstrap.min.js'
+        'js/bootstrap.min.js',
+        'js/morris.min.js',
+        'js/raphael-min.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -60,4 +60,8 @@ class CompanyUsers extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Companies::className(), ['id' => 'company']);
     }
+
+    public static function primaryKey(){
+        return ['user' ,'company'];
+    }
 }

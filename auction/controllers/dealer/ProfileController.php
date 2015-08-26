@@ -38,7 +38,7 @@ class ProfileController extends \yii\web\Controller
     {
         $model=$this->loadModel();
 
-        return $this->render('//dealer/profile',[
+        return $this->render('profile',[
             'model' => $model
         ]);
     }

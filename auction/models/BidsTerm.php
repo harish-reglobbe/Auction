@@ -45,9 +45,9 @@ class BidsTerm extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'max_bid' => 'Max Bid',
-            'cooling_prd' => 'cooling period',
-            'last_min_extd' => 'last minute extention',
-            'max_extd' => 'max extention',
+            'cooling_prd' => 'Cooling period',
+            'last_min_extd' => 'Last Minute extention',
+            'max_extd' => 'Max extention',
             'auction' => 'Auction',
         ];
     }

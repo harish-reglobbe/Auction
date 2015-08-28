@@ -25,6 +25,7 @@ $config=[
     'modules' => require __DIR__.'/'.RG_ENV.'/_module.php',
     'components' => [
         'request' => [
+            'class' => 'auction\components\AuctionRequest',
             'cookieValidationKey' => 'CxfcG_X1KQWeDTqXCZCDqt59j8HKqvao',
         ],
         'user' => [
@@ -35,13 +36,25 @@ $config=[
             'class' => 'yii\web\Response',
         ],
         'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'traceLevel' => YII_DEBUG ? 0 : 0,
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'logFile' => '@app/runtime/logs/Request/requests.log',
-                    'levels' => ['error','warning'],
+                    'levels' => ['error', 'warning'],
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['request'],
+                    'logFile' => '@app/runtime/logs/APIRequest/request.log',
                     'logVars' => [],
+                    'maxFileSize' => 1024 * 2,
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['response'],
+                    'logFile' => '@app/runtime/logs/APIResponse/response.log',
+                    'logVars' => [],
+                    'maxFileSize' => 1024 * 2,
                 ],
             ],
         ],

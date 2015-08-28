@@ -111,7 +111,9 @@ class UserController extends Controller
             $model=$this->findModel($id);
             $model->is_active=DatabaseHelper::IN_ACTIVE;
 
-            $model->save();
+            if(!$model->save()){
+                dump($model->getErrors());
+            }
         }
 
     }

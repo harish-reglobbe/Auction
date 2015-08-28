@@ -61,8 +61,8 @@ class AuctionsCriteria extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'auction' => 'Auction',
-            'security' => 'security deposit in rs. ',
-            'is_percent' => '0=:fixed cost,1=:percentage cost',
+            'security' => 'Security Deposit',
+            'is_percent' => 'Percent Cost',
             'create_date' => 'Create Date',
             'update_date' => 'Update Date',
             'is_active' => 'Is Active',

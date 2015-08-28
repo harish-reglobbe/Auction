@@ -12,9 +12,6 @@ return [
     'name' => 'Reglobe : Auction',
     'controllerNamespace' => 'auction\controllers',
     'defaultRoute' => 'site/index',
-    'aliases' => [
-        'brandImage' =>  '@auction/uploads/brands/',
-    ],
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [

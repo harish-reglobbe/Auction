@@ -2,6 +2,7 @@
 
 use yii\widgets\DetailView;
 use yii\helpers\Html;
+use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
 ?>
 
@@ -35,26 +36,46 @@ use auction\components\helpers\DatabaseHelper;
                                         ]
                                     ])?>
                                 </div>
-                                <div class="panel panel-info">
-                                    <div class="panel-heading">
-                                        Brand Description
-                                    </div>
-                                    <div class="panel-body">
-                                        <address>
-                                            <?= Html::encode($model->description) ?>
-                                        </address>
-                                    </div>
-                                    <!-- /.col-lg-4 -->
-                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Brand Image</a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <address>
+                                    <?= Html::img(Auction::$app->request->baseUrl.'/uploads/brands/'.$model->image) ?>
+                                </address>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">Brand Description</a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <address>
+                                    <?= Html::encode($model->description) ?>
+                                </address>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- .panel-body -->
         </div>
-        <!-- /.panel -->
+        <!-- .panel-body -->
     </div>
-    <!-- /.col-lg-12 -->
+    <!-- /.panel -->
+</div>
+<!-- /.col-lg-12 -->
 </div>
 <!-- /.row -->

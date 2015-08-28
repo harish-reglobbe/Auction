@@ -5,7 +5,7 @@ namespace auction\controllers\company;
 use auction\components\Auction;
 use auction\components\helpers\AccessRule;
 use yii\filters\AccessControl;
-use auction\components\helpers\DatabaseHelper;
+use yii\web\HttpException;
 use auction\models\Companies;
 
 class InfoController extends \yii\web\Controller

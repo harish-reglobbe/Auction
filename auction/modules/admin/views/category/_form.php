@@ -27,11 +27,11 @@ use yii\helpers\Url;
 
     <?= Html::hiddenInput('id', $model->id);?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'name')->label(false)->textInput(['placeholder' => 'Category Name','autofocus' => 'autofocus']) ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
 
-    <?= $form->field($model, 'is_active')->dropDownList(DatabaseHelper::Status()) ?>
+    <?= $form->field($model, 'is_active')->dropDownList(DatabaseHelper::Status())->label('Status') ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

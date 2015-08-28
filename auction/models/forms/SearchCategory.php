@@ -64,7 +64,8 @@ class SearchCategory extends Categories
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description]);
+                ->andFilterWhere(['like', 'description', $this->description])
+                 ->andFilterWhere(['like', 'create_date', $this->create_date]);
 
         return $dataProvider;
     }

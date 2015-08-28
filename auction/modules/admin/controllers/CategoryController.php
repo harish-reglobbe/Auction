@@ -72,6 +72,7 @@ class CategoryController extends Controller
     public function actionCreate()
     {
         $model = new Categories();
+        $model->scenario='create';
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return 'Success';

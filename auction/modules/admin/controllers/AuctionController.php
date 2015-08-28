@@ -2,6 +2,8 @@
 
 namespace auction\modules\admin\controllers;
 
+use auction\components\Auction;
+use auction\components\helpers\DatabaseHelper;
 use Yii;
 use auction\models\Auctions;
 use auction\models\forms\SearchAuction;
@@ -21,6 +23,7 @@ class AuctionController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                    'view' => ['post']
                 ],
             ],
         ];
@@ -46,11 +49,18 @@ class AuctionController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView()
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $id=Auction::$app->request->post('id',0);
+
+        if($id){
+
+            return $this->renderPartial('view', [
+                'model' => $this->findModel($id),
+            ]);
+
+        }
+
     }
 
 
@@ -60,11 +70,17 @@ class AuctionController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
-        $this->findModel($id)->delete();
+        $id=Auction::$app->request->post('id',0);
 
-        return $this->redirect(['index']);
+        if($id){
+            $model = $this->findModel($id);
+            $model->status= DatabaseHelper::IN_ACTIVE;
+
+            return $model->save();
+        }
+
     }
 
     /**
@@ -76,6 +92,15 @@ class AuctionController extends Controller
      */
     protected function findModel($id)
     {
+        $query=Auctions::find()->joinWith([
+            'bidsTerms',
+            'auctionsCriterias'
+        ])->where([
+           'auctions.id' => $id
+        ]);
+
+        $model=$query->one();
+
         if (($model = Auctions::findOne($id)) !== null) {
             return $model;
         } else {

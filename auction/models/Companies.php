@@ -92,6 +92,7 @@ class Companies extends \yii\db\ActiveRecord
         return $this->hasMany(Auctions::className(), ['company' => 'id']);
     }
 
+
     /**
      * @return \yii\db\ActiveQuery
      */

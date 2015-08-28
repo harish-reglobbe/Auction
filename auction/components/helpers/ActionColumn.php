@@ -35,6 +35,7 @@ class ActionColumn extends \yii\grid\ActionColumn
     private function viewButton($url,$model){
 
         return Html::button('<i class="fa fa-list"></i>',[
+            'title' => 'View',
             'class' => 'view-modal btn btn-primary btn-circle',
             'data-id' => $model->primaryKey
         ]);
@@ -49,7 +50,7 @@ class ActionColumn extends \yii\grid\ActionColumn
     private function deleteButton($url,$model){
 
         return Html::button('<i class="fa fa-times"></i>',[
-            'class' => 'delete-modal btn btn-danger btn-circle',
+            'class' => 'delete-modal btn btn-pencil btn-circle',
             'data-id' => $model->primaryKey
         ]);
 
@@ -62,6 +63,7 @@ class ActionColumn extends \yii\grid\ActionColumn
     private function updateButton($url,$model){
 
         return Html::button('<i class="fa fa-list"></i>',[
+            'title' => 'Update',
             'class' => 'update-modal btn btn-info btn-circle',
             'data-id' => $model->primaryKey
         ]);

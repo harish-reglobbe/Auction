@@ -15,10 +15,12 @@ class SearchProduct extends Products
     /**
      * @inheritdoc
      */
+    public $pageSize =10;
+
     public function rules()
     {
         return [
-            [['_id', 'id',], 'safe'],
+            [['_id', 'pageSize',], 'safe'],
         ];
     }
 

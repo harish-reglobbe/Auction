@@ -8,6 +8,7 @@
 
 namespace auction\widgets;
 
+use auction\models\MessageTemplate;
 use yii\base\Widget;
 use yii\web\HttpException;
 use yii\web\JsExpression;
@@ -17,31 +18,32 @@ use yii\helpers\Html;
 class ModelCrud extends Widget
 {
 
-    public $deleteUrl;
+//    public $deleteUrl;
     public $updateUrl;
     public $createUrl;
     public $viewUrl;
 
-    public $deleteVerb='get';
+//    public $deleteVerb='get';
     public $viewVerb='get';
     public $createVerb='get';
     public $updateVerb='get';
 
     public $updateModalSelector='.update-modal';
-    public $deleteModelSelector='.delete-modal';
+//    public $deleteModelSelector='.delete-modal';
     public $viewModalSelector='.view-modal';
     public $createModalSelector='#create-modal';
 
     public $pjaxContainerId='pjax-gridview';
 
-    public $deleteModelTitle='Delete';
+//    public $deleteModelTitle='Delete';
     public $template='{view}{delete}{update}{create}';
     public $modelTitle='Model';
+    public $modelClass;
 
     private $_renderJs;
 
     public function init(){
-        if(!$this->deleteUrl || !$this->updateUrl || !$this->createUrl || !$this->viewUrl){
+        if(!$this->updateUrl || !$this->createUrl || !$this->viewUrl){
             throw new HttpException(400, 'Urls Must Be defined');
         }
     }
@@ -70,23 +72,24 @@ class ModelCrud extends Widget
         Modal::begin([
             'id' => 'activity-modal',
             'header' => '<h2>'. $this->modelTitle .'</h2>',
-            'footer' => Html::button('Close', ['class' => 'btn btn-primary', 'data-dismiss' => 'modal']),
+            'footer' => Html::button('Close', ['class' => 'btn btn-info', 'data-dismiss' => 'modal']),
         ]);
+
         Modal::end();
 
-        Modal::begin([
-            'id' => 'activity-delete-modal',
-            'header' => '<h2>'. $this->deleteModelTitle .'</h2>',
-            'footer' => Html::button('Close', ['class' => 'btn btn-default', 'data-dismiss' => 'modal'])
-                . PHP_EOL . Html::button('Delete', [
-                    'class' => 'btn btn-primary btn-modal-save',
-                    'id' => 'delete-role-model',
-                    'data-id' => '',
-                    'onClick' => new JsExpression('var id=$("#delete-role-model").attr("data-id");$.ajax({type:"'. $this->deleteVerb .'",url:"'.$this->deleteUrl.'",data:{id:id},success:function(){$.pjax.reload({container:"#'. $this->pjaxContainerId .'",timeout:2e3}),$("#activity-delete-modal").modal("hide")}});')
-                ]),
-        ]);
-        echo 'Are You Sure To Delete This Item';
-        Modal::end();
+//        Modal::begin([
+//            'id' => 'activity-delete-modal',
+//            'header' => '<h2>'. $this->deleteModelTitle .'</h2>',
+//            'footer' => Html::button('Close', ['class' => 'btn btn-default', 'data-dismiss' => 'modal'])
+//                . PHP_EOL . Html::button('Delete', [
+//                    'class' => 'btn btn-primary btn-modal-save',
+//                    'id' => 'delete-role-model',
+//                    'data-id' => '',
+//                    'onClick' => new JsExpression('var id=$("#delete-role-model").attr("data-id");$.ajax({type:"'. $this->deleteVerb .'",url:"'.$this->deleteUrl.'",data:{id:id},success:function(){$.pjax.reload({container:"#'. $this->pjaxContainerId .'",timeout:2e3}),$("#activity-delete-modal").modal("hide")}});')
+//                ]),
+//        ]);
+//        echo 'Are You Sure To Delete This Item';
+//        Modal::end();
 
     }
 
@@ -102,9 +105,9 @@ class ModelCrud extends Widget
         return 'jQuery(document).on("click","'.$this->createModalSelector.'",function(){$.ajax({type:"'. $this->createVerb .'",url:"'.$this->createUrl.'",success:function(t){$("#activity-modal").find(".modal-body").html(t),$("#activity-modal").modal("show")}})})';
     }
 
-    private function deleteModalJs(){
-        return 'jQuery(document).on("click","'.$this->deleteModelSelector.'",function(){var t=$(this).attr("data-id");$("#delete-role-model").attr("data-id",t),$("#activity-delete-modal").modal("show")})';
-    }
+//    private function deleteModalJs(){
+//        return 'jQuery(document).on("click","'.$this->deleteModelSelector.'",function(){var t=$(this).attr("data-id");$("#delete-role-model").attr("data-id",t),$("#activity-delete-modal").modal("show")})';
+//    }
 
     private function appendJs($name){
         switch ($name) {
@@ -114,9 +117,9 @@ class ModelCrud extends Widget
             case "update":
                 $this->_renderJs.=$this->updateModalJs().',';
                 break;
-            case "delete":
-                $this->_renderJs.=$this->deleteModalJs().',';
-                break;
+//            case "delete":
+//                $this->_renderJs.=$this->deleteModalJs().',';
+//                break;
             case "create":
                 $this->_renderJs.=$this->createModalJs().',';
                 break;

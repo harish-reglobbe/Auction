@@ -24,7 +24,9 @@ class AppAsset extends AssetBundle
         'css/bootstrap.min.css',
         'css/morris.css',
         'css/sb-admin-2.css',
-        'css/font-awesome.min.css'
+        'css/font-awesome.min.css',
+        'fonts/FontAwesome.otf',
+        'fonts/fontawesome-webfont.eot'
     ];
 
     public $js = [

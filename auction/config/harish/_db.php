@@ -18,6 +18,6 @@ return [
     ],
     'mongodb' => [
         'class' => '\yii\mongodb\Connection',
-        'dsn' => 'mongodb://192.168.1.126:27017/auction',
+        'dsn' => 'mongodb://localhost:27017/auction',
     ],
 ];

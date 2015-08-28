@@ -53,8 +53,8 @@ class Categories extends \yii\db\ActiveRecord
             [['name', 'is_active'], 'required'],
             [['description'], 'safe'],
             [['is_active'], 'integer'],
-            [['name'], 'string', 'max' => 255],
-            ['name','unique','on' => 'create']
+            [['name'], 'string', 'max' => 255, 'min' => 3],
+            ['name','unique' ,'on' => 'create']
         ];
     }
 

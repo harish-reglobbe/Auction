@@ -22,4 +22,7 @@ return [
         'paytm' => [
             'class' => 'frontend\modules\paytm\Module',
         ],
+        'api' => [
+            'class' => 'auction\modules\api\Api',
+        ],
 ];

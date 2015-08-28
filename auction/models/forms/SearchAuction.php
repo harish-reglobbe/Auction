@@ -2,7 +2,6 @@
 
 namespace auction\models\forms;
 
-use frontend\components\Reglobe;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -13,14 +12,17 @@ use auction\models\Auctions;
  */
 class SearchAuction extends Auctions
 {
+
+    public $pageSize=10;
+    public $companyName;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'duration', 'company', 'status', 'priority'], 'integer'],
-            [['name', 'create_date', 'start_date'], 'safe'],
+            [['id', 'duration', 'status', 'priority','pageSize'], 'integer'],
+            [['name', 'create_date', 'start_date','companyName'], 'safe'],
             [['amount'], 'number'],
         ];
     }
@@ -55,6 +57,8 @@ class SearchAuction extends Auctions
 
         $this->load($params);
 
+        $dataProvider->pagination->pageSize=$this->pageSize;
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -62,15 +66,14 @@ class SearchAuction extends Auctions
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'start_date' => $this->start_date,
             'duration' => $this->duration,
-            'amount' => $this->amount,
-            'status' => $this->status,
-            'priority' => $this->priority,
+            'auctions.amount' => $this->amount,
+            'auctions.status' => $this->status,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'auctions.name', $this->name])
+            ->andFilterWhere(['like', 'companies.name', $this->companyName])
+            ->andFilterWhere(['like', 'auctions.create_date', $this->create_date]);
 
         return $dataProvider;
     }

@@ -58,11 +58,9 @@ class Brands extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'is_active'], 'required'],
+            [['name',], 'required'],
             [['description'], 'string'],
-            [['create_date', 'update_date'], 'safe'],
             [['is_active'], 'integer'],
-            [[ 'image'], 'file']
         ];
     }
 
@@ -124,16 +122,27 @@ class Brands extends \yii\db\ActiveRecord
 
 
     public function save($runValidation = true, $attributeNames = null){
-        $this->image=UploadedFile::getInstance($this,'image');
 
-        if($this->image){
+        $this->image=UploadedFile::getInstance($this,'image');
+        parent::validate();
+
+        if($this->image instanceof UploadedFile){
+
+            if(!getimagesize($this->image->tempName)){
+                $this->addError('image','Please Upload a valid Image');
+                return false;
+            }
+
             $uploadDirectory= $this->UploadDirectory();
 
             if(!is_dir($uploadDirectory)){
                 FileHelper::createDirectory($uploadDirectory);
             }
 
-            $this->image->saveAs($uploadDirectory.$this->image->baseName.'.'.$this->image->extension);
+            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
+
+            $this->image->saveAs($uploadDirectory.$imageName);
+            $this->image=$imageName;
 
         }
 
@@ -143,10 +152,19 @@ class Brands extends \yii\db\ActiveRecord
 
     public function afterSave(){
 
-        $uploadDirectory=$this->UploadDirectory();
-        Image::thumbnail($uploadDirectory.$this->image,100,100)
-                ->save($uploadDirectory.'thumbs/'.$this->image,['quality' => 50]);
+        if($this->image !== null) {
 
+            $uploadDirectory = $this->UploadDirectory();
+            $thumbDirectory = $uploadDirectory.'thumbs/';
+
+            if(!is_dir($thumbDirectory)){
+                FileHelper::createDirectory($thumbDirectory);
+            }
+
+            Image::thumbnail($uploadDirectory .$this->image, 50, 50)
+                ->save($thumbDirectory . $this->image, ['quality' => 50]);
+
+        }
         return true;
 
     }
@@ -155,7 +173,7 @@ class Brands extends \yii\db\ActiveRecord
     private function UploadDirectory(){
 
         if($this->_uploadDirectory === null){
-            $this->_uploadDirectory = Auction::getAlias('@auction').'/uploads/brands/';
+            $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/brands/';
         }
 
         return $this->_uploadDirectory;

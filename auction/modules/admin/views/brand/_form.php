@@ -28,11 +28,21 @@ use yii\helpers\Url;
 
     <?= Html::hiddenInput('id', $model->id);?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'name',[
+        'errorOptions' => [
+            'class' => 'error',
+            'tag' => 'span'
+        ]
+    ])->label(false)->textInput(['placeholder' => 'Brand Name','autofocus' => 'autofocus']) ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
 
-    <?= $form->field($model, 'image')->fileInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'image',[
+        'errorOptions' => [
+            'class' => 'error',
+            'tag' => 'span'
+        ]
+    ])->fileInput() ?>
 
     <?= $form->field($model, 'is_active')->dropDownList(DatabaseHelper::Status()) ?>
 

@@ -1,41 +1,60 @@
 <?php
 
-use yii\helpers\Html;
 use yii\widgets\DetailView;
-
-/* @var $this yii\web\View */
-/* @var $model auction\models\MessageTemplate */
-
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Message Templates', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+use yii\helpers\Html;
+use auction\components\helpers\DatabaseHelper;
 ?>
-<div class="message-template-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'type',
-            'text:ntext',
-            'created_at',
-            'updated_at',
-            'is_active',
-        ],
-    ]) ?>
-
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Template Info
+            </div>
+            <!-- .panel-heading -->
+            <div class="panel-body">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Template Full Info</a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="list-group">
+                                    <?= DetailView::widget([
+                                        'model' => $model,
+                                        'template' => '<a href="#" class="list-group-item">{label}<span class="pull-right text-muted small"><em>{value}</em></span></a>',
+                                        'attributes' => [
+                                            'name',
+                                            [
+                                                'label' => 'Status',
+                                                'value' => DatabaseHelper::GetStatus($model->is_active)
+                                            ],
+                                        ]
+                                    ])?>
+                                </div>
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        Category Description
+                                    </div>
+                                    <div class="panel-body">
+                                        <address>
+                                            <?= Html::encode($model->text) ?>
+                                        </address>
+                                    </div>
+                                    <!-- /.col-lg-4 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- .panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
 </div>
+<!-- /.row -->

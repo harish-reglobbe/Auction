@@ -18,6 +18,7 @@ return [
         ],
         'admin' => [
             'class' => 'auction\modules\admin\Admin',
+            'defaultRoute' => 'user'
         ],
         'paytm' => [
             'class' => 'frontend\modules\paytm\Module',

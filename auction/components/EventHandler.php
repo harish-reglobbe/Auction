@@ -9,6 +9,8 @@
 namespace auction\components;
 
 use yii\base\Component;
+use yii\helpers\FileHelper;
+use yii\imagine\Image;
 
 class EventHandler extends Component{
 
@@ -49,6 +51,21 @@ class EventHandler extends Component{
         $event->sender->last_login=Auction::$app->formatter->asDatetime(strtotime('NOW'));
 
         $event->sender->save();
+
+    }
+
+    /** Upload Image Thumb */
+    public static function UploadImageThumb($event){
+
+        $uploadDirectory= $event->sender->UploadDirectory();
+        $thumbDirectory = $uploadDirectory.'thumbs/';
+
+        if(!is_dir($thumbDirectory)){
+            FileHelper::createDirectory($thumbDirectory);
+        }
+
+        Image::thumbnail($uploadDirectory .$event->sender->image, 50, 50)
+            ->save($thumbDirectory . $event->sender->image, ['quality' => 50]);
 
     }
 }

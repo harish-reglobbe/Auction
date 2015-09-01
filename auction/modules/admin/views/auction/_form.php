@@ -2,36 +2,40 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use auction\components\helpers\DatabaseHelper;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $model auction\models\Auctions */
+/* @var $model auction\models\Users */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="auctions-form">
+<div class="users-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php Pjax::begin(['id' => 'brand-form','enablePushState' => false, 'timeout' => false])?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'create-brand',
+        //'action' => Url::to(['brand/create']),
+        'options' => [
+            'data-pjax' => 1,
+        ],
+        'enableClientValidation' => false
 
-    <?= $form->field($model, 'create_date')->textInput() ?>
+    ]); ?>
 
-    <?= $form->field($model, 'start_date')->textInput() ?>
+    <?= Html::hiddenInput('id', $model->id);?>
 
-    <?= $form->field($model, 'duration')->textInput() ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true,'disabled' => true]) ?>
 
-    <?= $form->field($model, 'amount')->textInput() ?>
+    <?= $form->field($model, 'status')->dropDownList(DatabaseHelper::Status()) ?>
 
-    <?= $form->field($model, 'company')->textInput() ?>
-
-    <?= $form->field($model, 'status')->textInput() ?>
-
-    <?= $form->field($model, 'priority')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
+    <?php Pjax::end();?>
 
 </div>

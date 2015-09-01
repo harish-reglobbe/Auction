@@ -2,8 +2,10 @@
 
 namespace auction\models;
 
+use auction\components\helpers\DatabaseHelper;
 use common\components\JAPI;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
@@ -26,7 +28,6 @@ class Products extends \yii\mongodb\ActiveRecord
 {
     public $productCSV=null;
     private $_request;
-
 
     /**
      * @inheritdoc
@@ -66,7 +67,7 @@ class Products extends \yii\mongodb\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'brand_id', 'cat_id', 'lot_id', 'prize'], 'required'],
+            [['name', 'brand_id', 'cat_id', 'lot_id', 'prize',], 'required'],
             //['image' , 'file' ,'skipOnEmpty' => false],
             ['productCSV', 'file', 'extensions' => ['csv'], 'maxSize' => 1024*1024 ],
             [[ 'condition', 'extra_cond'], 'safe']
@@ -95,10 +96,13 @@ class Products extends \yii\mongodb\ActiveRecord
     /**  Save Product Model**/
     public function save($runValidation = true, $attributeNames = null){
 
-        parent::save($runValidation,$attributeNames);
+        $this->doMasking();
 
-        $client = new JAPI();
-        $response=$client->process('http://http://192.168.1.42:8080/api',JAPI::HTTP_METHOD_GET,$this->_request);
+        $request = new \HttpRequest(DatabaseHelper::JAVA_API_PRODUCT_URL, HTTP_METH_POST);
+        $request->setRawPostData($this->_request);
+        $request->send();
+        $response = $request->getResponseBody();
+
         dump($response);
 
     }
@@ -107,7 +111,7 @@ class Products extends \yii\mongodb\ActiveRecord
     public static function deleteAll($condition = [], $options = []){
 
         //new HttpGet(API_URL+"/users/otp.json?pid=Xi32jNW0&pid=jl2S7dLp&pid=ycQOmNA3");
-        $url='http://192.168.1.126:8080/api/product.json?';
+        $url=DatabaseHelper::JAVA_API_PRODUCT_URL;
 
         if(is_string($condition)){
             $url.='pid='.$condition;
@@ -169,17 +173,19 @@ class Products extends \yii\mongodb\ActiveRecord
 
     private function doMasking(){
         //'pn', 'img', 'bi', 'ci', 'pri', 'c', 'ec'
-        $_request=[];
+        $_request=$_data=[];
 
         $_request['pn']=$this->name;
-        $_request['img']=$this->image;
-        $_request['bi']=$this->brand;
-        $_request['ci']=$this->condition;
+        $_request['bi']=$this->brand_id;
+        $_request['ci']=$this->cat_id;
+        $_request['lot_id'] = $this->lot_id;
         $_request['pri']=$this->prize;
         $_request['c']=$this->condition;
-        $_request['ec']=$this->extra_condition;
+        $_request['ec']=$this->extra_cond;
 
-        $this->_request=Json::encode($_request);
+        $_data[] = $_request;
+
+        $this->_request=Json::encode($_data);
 
     }
 

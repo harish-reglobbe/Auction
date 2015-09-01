@@ -18,4 +18,6 @@ class Events extends Event{
 
     const USER_LOGIN='user_login';
 
+    const SAVE_UPLOAD_THUMB = 'upload_thumb';
+
 }

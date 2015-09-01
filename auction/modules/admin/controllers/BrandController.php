@@ -23,7 +23,7 @@ class BrandController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
-                   // 'create' => ['post'],
+                    'create' => ['post'],
                     'view' => ['post'],
                     'update' => ['post']
                 ],

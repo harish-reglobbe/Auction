@@ -3,9 +3,11 @@
 namespace auction\models;
 
 
+use auction\components\Auction;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\db\Query;
 
 /**
  * This is the model class for table "{{%companies}}".
@@ -111,5 +113,16 @@ class Companies extends \yii\db\ActiveRecord
 
     public function getUser(){
         return $this->hasOne(Users::className(),['id' => 'user'])->viaTable(CompanyUsers::tableName(),['company' => 'id']);
+    }
+
+    //Company Details having count all auctions and users and dealers
+    public function getCompanyDetails(){
+
+        return (new Query())->select(
+            '('.(new Query())->select('count(*)')->from(Auctions::tableName())->where(['company' => $this->id])->createCommand()->rawSql.') as companyAuctions,'.
+            '('.(new Query())->select('count(*)')->from(CompanyUsers::tableName())->where('company=:c and user!=:u',[':c' => $this->id , ':u' => Auction::$app->user->id])->createCommand()->rawSql.') as companyUsers,'.
+            '('.(new Query())->select('count(*)')->from(DealerCompany::tableName())->where(['company' => $this->id])->createCommand()->rawSql.') as companyDealers'
+        )->one();
+
     }
 }

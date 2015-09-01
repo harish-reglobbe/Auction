@@ -13,8 +13,16 @@ use auction\components\Auction;
 
 switch ($key){
     case 'dealerSecurity':
-        $url=false;$panelClass='panel-primary';$text='Dealer Security Amount';
+        $url='dealer/payment';$panelClass='panel-primary';$text='My Security Amount';$model.= ' &#8377  ';
         break ;
+
+    case 'dealerCompanies':
+        $url='dealer/companies';$panelClass='panel-red';$text='My Companies';
+        break ;
+
+    case 'dealerAuctions':
+        $url='dealer/auctions';$panelClass='panel-green';$text='My Auctions';
+        break;
 
     default:
         $url='#';$panelClass='panel-red';$text='View';

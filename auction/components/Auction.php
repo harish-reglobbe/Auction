@@ -17,4 +17,7 @@ use Yii;
 
 class Auction extends Yii{
 
+    public static function createUrl($url){
+        return Yii::$app->urlManager->createAbsoluteUrl([$url]);
+    }
 }

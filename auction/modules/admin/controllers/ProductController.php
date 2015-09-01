@@ -38,6 +38,7 @@ class ProductController extends Controller
      */
     public function actionIndex()
     {
+
         $searchModel =new SearchProduct();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -72,7 +73,7 @@ class ProductController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return "Success";
         } else {
-            return $this->renderAjax('_form', [
+            return $this->render('_form', [
                 'model' => $model,
             ]);
         }

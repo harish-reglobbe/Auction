@@ -22,7 +22,6 @@ class StatusColumn extends Column{
 
 
     public function init(){
-
         parent::init();
     }
 
@@ -36,7 +35,7 @@ class StatusColumn extends Column{
 
     protected function renderFilterCellContent()
     {
-        return Html::activeDropDownList($this->grid->filterModel,'is_active',DatabaseHelper::Status(),['class' => 'form-control','prompt' => '-------']);
+        return Html::activeDropDownList($this->grid->filterModel,$this->statusColumn,DatabaseHelper::Status(),['class' => 'form-control','prompt' => '-------']);
     }
 
 }

@@ -7,6 +7,8 @@ use auction\models\forms\DealerRegistration;
 
 class RegistrationController extends \yii\web\Controller
 {
+    public $layout = 'login';
+
     public function actionIndex()
     {
         if(!Auction::$app->user->isGuest){
@@ -19,6 +21,8 @@ class RegistrationController extends \yii\web\Controller
             if ($user = $model->SaveDealer()) {
                 Auction::$app->session->setFlash('success', 'Thank you ');
             }
+
+            return $this->refresh();
         }
 
         return $this->render('//dealer/registration', [

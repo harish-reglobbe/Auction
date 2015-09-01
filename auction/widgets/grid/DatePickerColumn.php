@@ -52,7 +52,6 @@ class DatePickerColumn extends  Column{
 
     protected function renderFilterCellContent()
     {
-
         return DatePicker::widget([
             'model' => $this->grid->filterModel,
             'attribute' => $this->dateColumn,

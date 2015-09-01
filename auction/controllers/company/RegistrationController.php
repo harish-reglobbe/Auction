@@ -8,6 +8,8 @@ use yii\web\Controller;
 
 class RegistrationController extends Controller
 {
+    public $layout='login';
+
     public function actionIndex()
     {
         if(!Auction::$app->user->isGuest){
@@ -20,6 +22,8 @@ class RegistrationController extends Controller
             if ($user = $model->SaveCompany()) {
                 Auction::$app->session->setFlash('success', 'Thank you ');
             }
+
+            return $this->refresh();
         }
 
         return $this->render('//company/registration', [

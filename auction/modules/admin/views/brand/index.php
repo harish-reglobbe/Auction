@@ -1,6 +1,6 @@
 <?php
 
-use auction\widgets\GridView;
+use auction\widgets\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel auction\models\forms\SearchBrand */
@@ -8,8 +8,6 @@ use auction\widgets\GridView;
 
 $this->title='Brands';
 ?>
-
-<div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">Brands</h1>
@@ -33,6 +31,7 @@ $this->title='Brands';
 
                             'name',
                             'description:ntext',
+                            ['class' => 'auction\widgets\grid\ImageColumn',],
                             [
                                 'class' => 'auction\widgets\grid\DatePickerColumn',
                                 'dateColumn' => 'create_date'
@@ -54,13 +53,11 @@ $this->title='Brands';
         <!-- /.col-lg-12 -->
     </div>
     <!-- /.row -->
-</div>
-<!-- /#page-wrapper -->
 <?php
-/*$this->registerJs('
+$this->registerJs('
     jQuery(document).on("pjax:success", "#brand-form",  function(event){$.pjax.reload({container:"#pjax-gridview",timeout:2e3}),$("#activity-modal").modal("hide")});
     jQuery(document).pjax("#brand-form a", "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});
     jQuery(document).on("submit", "#brand-form form[data-pjax]", function (event) {jQuery.pjax.submit(event, "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});});
-    ');*/
+    ');
 ?>
 

@@ -7,8 +7,9 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\helpers\FileHelper;
-use yii\imagine\Image;
 use yii\web\UploadedFile;
+use auction\components\Events;
+use auction\components\EventHandler;
 
 /**
  * This is the model class for table "{{%brands}}".
@@ -80,6 +81,10 @@ class Brands extends \yii\db\ActiveRecord
         ];
     }
 
+    public function init(){
+        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -124,9 +129,11 @@ class Brands extends \yii\db\ActiveRecord
     public function save($runValidation = true, $attributeNames = null){
 
         $this->image=UploadedFile::getInstance($this,'image');
-        parent::validate();
 
-        if($this->image instanceof UploadedFile){
+        if(!parent::validate())
+            return false;
+
+        if($this->image && $this->image instanceof UploadedFile){
 
             if(!getimagesize($this->image->tempName)){
                 $this->addError('image','Please Upload a valid Image');
@@ -143,34 +150,21 @@ class Brands extends \yii\db\ActiveRecord
 
             $this->image->saveAs($uploadDirectory.$imageName);
             $this->image=$imageName;
+            $this->trigger(Events::SAVE_UPLOAD_THUMB);
 
         }
-
-        return parent::save();
-
-    }
-
-    public function afterSave(){
-
-        if($this->image !== null) {
-
-            $uploadDirectory = $this->UploadDirectory();
-            $thumbDirectory = $uploadDirectory.'thumbs/';
-
-            if(!is_dir($thumbDirectory)){
-                FileHelper::createDirectory($thumbDirectory);
-            }
-
-            Image::thumbnail($uploadDirectory .$this->image, 50, 50)
-                ->save($thumbDirectory . $this->image, ['quality' => 50]);
-
+        else {
+            $this->image = $this->oldAttributes['image'];
         }
-        return true;
+
+
+        return parent::save(false);
 
     }
 
 
-    private function UploadDirectory(){
+
+    public function UploadDirectory(){
 
         if($this->_uploadDirectory === null){
             $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/brands/';
@@ -179,4 +173,5 @@ class Brands extends \yii\db\ActiveRecord
         return $this->_uploadDirectory;
 
     }
+
 }

@@ -14,7 +14,7 @@ use yii\filters\VerbFilter;
 /**
  * AuctionController implements the CRUD actions for Auctions model.
  */
-class AuctionController extends Controller
+class AuctionController extends CategoryController
 {
     public function behaviors()
     {

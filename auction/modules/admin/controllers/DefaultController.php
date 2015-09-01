@@ -11,8 +11,6 @@ class DefaultController extends Controller
 {
     public function actionIndex()
     {
-        $model= Companies::find()->joinWith('auctions',true,'RIGHT JOIN')->count();
-
-        dump($model);
+        return $this->render('index');
     }
 }

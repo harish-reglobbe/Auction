@@ -4,11 +4,9 @@ namespace auction\modules\admin\controllers;
 
 use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
-use Codeception\Subscriber\Bootstrap;
 use Yii;
 use auction\models\Categories;
 use auction\models\forms\SearchCategory;
-use yii\bootstrap\Alert;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -99,7 +97,7 @@ class CategoryController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return 'Successfully Updated';
             } else {
-                return $this->renderPartial('update', [
+                return $this->renderPartial('_form', [
                     'model' => $model,
                 ]);
             }

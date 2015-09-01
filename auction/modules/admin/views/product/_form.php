@@ -1,67 +1,50 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
+use yii\widgets\Pjax;
 use yii\helpers\ArrayHelper;
-use frontend\models\Brands;
-use frontend\models\Categories;
-
+use auction\models\Categories;
+use auction\models\Brands;
+use auction\models\Lots;
 /* @var $this yii\web\View */
-/* @var $model frontend\models\Products */
+/* @var $model auction\models\Brands */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<div class="brands-active-form">
 
-<?php
-$this->registerJs('
-    $.pjax.defaults.timeout = 5000;
-    $("#product-form-pjax").on("pjax:success", function(data, status, xhr, options) {
-            if(options.responseText == "Success"){
-                $.pjax.reload({container: "#pjax-gridview", timeout: 2000});
-                $("#activity-modal").modal("hide");
-            }
-    });
-    ');
-?>
-
-
-<div class="products-form">
-
-    <?php Pjax::begin(['id' => 'product-form-pjax', 'enablePushState' => FALSE]) ?>
+    <?php //Pjax::begin(['id' => 'brand-form','enablePushState' => false, 'timeout' => false])?>
 
     <?php $form = ActiveForm::begin([
-        'id' => 'crud-model-form',
-        'action' => ['product/create'],
+        'id' => 'create-brand',
+        //'action' => Url::to(['brand/create']),
         'options' => [
-            'data-pjax' => true,
-            ]
-        ]);
-    ?>
+            'data-pjax' => 1,
+        ],
+        'enableClientValidation' => false
 
-    <?= $form->field($model, 'name') ?>
+    ]); ?>
 
-    <?= $form->field($model, 'image') ?>
+    <?= Html::hiddenInput('id', $model->id);?>
 
-    <?= $form->field($model, 'brand')->dropDownList(ArrayHelper::map(Brands::find()->all(),'id','name')) ?>
+    <?= $form->field($model, 'name')->textInput() ?>
 
-    <?= $form->field($model, 'category')->dropDownList(ArrayHelper::map(Categories::find()->all(),'id','name'),['select' => ''])?>
+    <?= $form->field($model, 'brand_id')->dropDownList(ArrayHelper::map(Brands::find()->asArray()->all(),'id' ,'name')) ?>
 
-    <?= $form->field($model, 'lot') ?>
+    <?= $form->field($model, 'cat_id')->dropDownList(ArrayHelper::map(Categories::find()->asArray()->all(),'id' ,'name')) ?>
 
-    <?= $form->field($model, 'prize') ?>
+    <?= $form->field($model, 'lot_id')->dropDownList(ArrayHelper::map(Lots::find()->asArray()->all(),'id' ,'name')) ?>
 
-    <?= $form->field($model, 'condition') ?>
+    <?= $form->field($model, 'condition')->textarea(['row' => 3]) ?>
 
-    <?= $form->field($model, 'extra_condition') ?>
+    <?= $form->field($model, 'extra_cond')->textarea(['row' => 5]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-
-    <?php Pjax::end() ?>
+    <?php //Pjax::end();?>
 
 </div>
-

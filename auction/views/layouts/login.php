@@ -5,7 +5,9 @@
 
 use auction\assets\AppAsset;
 use yii\helpers\Html;
+use yii\bootstrap\NavBar;
 use auction\components\Auction;
+use yii\bootstrap\Nav;
 
 AppAsset::register($this);
 ?>
@@ -30,22 +32,33 @@ AppAsset::register($this);
 </head>
 <body class="bgwhite">
 <?php $this->beginBody() ?>
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="#"><img src="<?= Auction::$app->request->baseUrl.'/images/logo-reglobe.png'?>" alt="" /></a>
-    </div>
-    <!-- /.navbar-header -->
-    <ul class="nav navbar-top-links navbar-right">
-        <li><div class="Partner-logo navbar-brand">Apple Exchange Program </div></li>
-    </ul>
-    <!-- /.navbar-top-links -->
-</nav>
+
+<?php
+NavBar::begin([
+    'brandLabel' => '<img alt="" src="/Auction/auction/web/images/logo-reglobe.png">',
+    'brandUrl' => '#',
+    'renderInnerContainer' => false,
+    'options' => [
+        'class' => 'navbar navbar-default navbar-static-top',
+        'style' => 'margin-bottom: 0',
+        'role' => 'navigation',
+        'id' => false
+    ],
+]);
+
+echo Nav::widget([
+      'items' => [
+          ['label' => '<div class="Partner-logo navbar-brand">Apple Exchange Program </div>', 'url' => Auction::createUrl('site/login')],
+      ],
+    'encodeLabels' => false,
+    'options' => [
+        'class' => 'nav navbar-top-links navbar-right',
+    ]
+  ]);
+
+NavBar::end();
+?>
+
 <div class="container">
     <?= $content?>
 </div>

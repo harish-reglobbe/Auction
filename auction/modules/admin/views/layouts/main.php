@@ -49,7 +49,7 @@ AppAsset::register($this);
                         ['label' => '<i class="fa fa-user fa-fw"></i>User Profile', 'url' => '#', 'options' => ['class' => false]],
                         ['label' => '<i class="fa fa-gear fa-fw"></i>Settings', 'url' => '#', 'options' => ['class' => false]],
                         ['label' => false, 'url' => false, 'options' => ['class' => 'divider']],
-                        ['label' => '<i class="fa fa-sign-out fa-fw"></i>Logout</a>', 'url' => Url::to(['site/logout']), 'options' => ['class' => false]],
+                        ['label' => '<i class="fa fa-sign-out fa-fw"></i>Logout</a>', 'url' => Auction::createUrl('site/logout'), 'options' => ['class' => false]],
                     ],
                 ],
             ],
@@ -63,27 +63,23 @@ AppAsset::register($this);
                 <?= Menu::widget([
                     'options' => ['class' => 'nav', 'id' => 'side-menu'],
                     'items' => [
-                        ['label' => '<i class="fa fa-dashboard fa-fw"></i>Dashboard', 'url' => Auction::createUrl('company/info')],
+                        ['label' => '<i class="fa fa-dashboard fa-fw"></i>Dashboard', 'url' => '#'],
                         [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Auctions<span class="fa arrow"></span></a>',
+                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Operations<span class="fa arrow"></span></a>',
                             'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Auctions', 'url' => Auction::createUrl('company/auction')],
-                                ['label' => '<i class="fa  fa-github-square fa-fw"></i>Add Auction', 'url' => Auction::createUrl('company/create-auction')],
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Brands', 'url' => Auction::createUrl('admin/brand')],
+                                ['label' => '<i class="fa  fa-github-square fa-fw"></i>Category', 'url' => Auction::createUrl('admin/category')],
                             ],
                         ],
                         [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Users<span class="fa arrow"></span></a>',
+                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Products<span class="fa arrow"></span></a>',
                             'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Company Users', 'url' => Auction::createUrl('company/user')],
-                                ['label' => '<i class="fa  fa-github-square fa-fw"></i>Dealers', 'url' => Auction::createUrl('company/dealer')],
+                                ['label' => '<i class="fa fa-truck fa-fw"></i>List Products', 'url' => Auction::createUrl('admin/product')],
+                                ['label' => '<i class="fa fa-upload fa-fw"></i>Upload Products List', 'url' => Auction::createUrl('admin/product/upload')],
                             ],
                         ],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Setting<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Update Info', 'url' => Auction::createUrl('company/edit')],
-                            ],
-                        ],
+                        ['label' => '<i class="fa fa-user fa-fw"></i>Users', 'url' => Auction::createUrl('admin/user')],
+                        ['label' => '<i class="fa fa-credit-card fa-fw"></i>Auction', 'url' => Auction::createUrl('admin/auction')],
                         ['label' => '<i class="fa fa-sign-out fa-fw"></i>Sign Out', 'url' => Auction::createUrl('site/logout')],
                     ],
                     'encodeLabels' => false, //allows you to use html in labels,

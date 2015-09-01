@@ -3,6 +3,8 @@
 namespace auction\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%message_template}}".
@@ -17,6 +19,16 @@ use Yii;
  */
 class MessageTemplate extends \yii\db\ActiveRecord
 {
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -31,7 +43,7 @@ class MessageTemplate extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type', 'text', 'created_at', 'updated_at', 'is_active'], 'required'],
+            [['name', 'type', 'text', 'is_active'], 'required'],
             [['type', 'is_active'], 'integer'],
             [['text'], 'string'],
             [['created_at', 'updated_at'], 'safe'],

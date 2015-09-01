@@ -9,25 +9,30 @@
 namespace auction\widgets\grid;
 
 
-use yii\grid\Column;
+use auction\components\Auction;
+use yii\helpers\Html;
 
-class ImageColumn extends Column{
+class ImageColumn extends StatusColumn{
 
-    public $header = 'Status';
+    public $header = 'Thumb Image';
 
-    public $statusColumn = 'is_active';
+    public $statusColumn = 'image';
+
+    public $directory;
 
 
     public function init(){
-
+        $this->directory = Auction::$app->request->baseUrl.'/uploads/brands/thumbs/';;
         parent::init();
     }
 
     protected function renderDataCellContent($model, $key, $index)
     {
+        return Html::img($this->directory.$model->image);
+    }
 
-        $statusColumn = $this->statusColumn;
-        return DatabaseHelper::GetStatus($model->$statusColumn);
-
+    protected function renderFilterCellContent()
+    {
+        return '';
     }
 }

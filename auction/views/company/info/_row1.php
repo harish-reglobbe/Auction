@@ -12,12 +12,20 @@ use auction\components\Auction;
  */
 
 switch ($key){
-    case 'companyUser':
+    case 'companyUsers':
         $url='company/user';$panelClass='panel-primary';$text='View Users';
         break ;
 
+    case 'companyAuctions':
+        $url='company/auction';$panelClass='panel-red';$text='View Auctions';
+        break ;
+
+    case 'companyDealers':
+        $url='company/dealer';$panelClass='panel-green';$text='View Dealers';
+        break ;
+
     default:
-        $url='#';$panelClass='panel-red';$text='View';
+        $url='#';$panelClass='panel-red';$text='View Auctions';
 }
 ?>
 

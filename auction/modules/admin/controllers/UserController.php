@@ -22,7 +22,9 @@ class UserController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post','view'],
+                    'delete' => ['post'],
+                    'view' => ['post'],
+                    'update' => ['post']
                 ],
             ],
         ];
@@ -84,16 +86,21 @@ class UserController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+        $id=Auction::$app->request->post('id');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if($id){
+            $model = $this->findModel($id);
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return 'Successfully Updated';
+            } else {
+                return $this->renderPartial('_form', [
+                    'model' => $model,
+                ]);
+            }
+
         }
     }
 

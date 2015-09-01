@@ -51,6 +51,8 @@ class SearchTemplate extends MessageTemplate
 
         $this->load($params);
 
+        $dataProvider->pagination->pageSize=$this->pageSize;
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');

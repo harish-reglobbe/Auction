@@ -80,6 +80,8 @@ class LoginForm extends Model
 
             if($user->company !== null){
                 Auction::$app->session->set('user.company',$user->company->id);
+            }elseif($user->dealers !== null){
+                Auction::$app->session->set('user.dealer',$user->dealers->id);
             }
 
             //Trigger User Login Event

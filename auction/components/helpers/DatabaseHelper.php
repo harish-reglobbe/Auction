@@ -25,6 +25,9 @@ class DatabaseHelper
     const EMAIL_TOKEN_VALID_TIME='+ 24 hour';
     const SMS_TOKEN_VALID_TIME= '+1 hour';
 
+    const JAVA_API_PRODUCT_URL='http://192.168.1.111:8080/api/product.json';
+    const JAVA_API_LOT_URL='http://192.168.1.111:8080/api/product/lot.json';
+
     public static function UserRole($isShownAdmin=false){
 
         $roles=[
@@ -70,4 +73,22 @@ class DatabaseHelper
         ];
     }
 
+    public static function TemplateType(){
+        return [
+            0 => 'Email',
+            1 => 'SMS'
+        ];
+    }
+
+    public static function GetTemplateType($type){
+
+        $statusValue='';
+        $define_status=self::TemplateType();
+
+        if(ArrayHelper::keyExists($type,$define_status)){
+            $statusValue=ArrayHelper::getValue($define_status,$type);
+        }
+
+        return $statusValue;
+    }
 }

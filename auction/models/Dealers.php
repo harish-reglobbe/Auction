@@ -3,6 +3,7 @@
 namespace auction\models;
 
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "{{%dealers}}".
@@ -88,7 +89,7 @@ class Dealers extends \yii\db\ActiveRecord
      */
     public function getDealerSecurities()
     {
-        return $this->hasMany(DealerSecurity::className(), ['dealer' => 'id']);
+        return $this->hasOne(DealerSecurity::className(), ['dealer' => 'id']);
     }
 
     /**
@@ -98,4 +99,19 @@ class Dealers extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Users::className(), ['id' => 'user']);
     }
+
+
+    public function getDealerDetails(){
+
+        return (new Query())->select('Coalesce(ds.security, 0) as `dealerSecurity`,count(dc.id) as dealerCompanies,count(da.dealer) as dealerAuctions')
+                    ->from(Dealers::tableName(). 'd')
+                    ->leftJoin(DealerCompany::tableName().' dc', 'dc.dealer=d.id')
+                    ->leftJoin(DealerSecurity::tableName(). 'ds', 'ds.dealer=d.id')
+                    ->leftJoin(DealerAuctions::tableName().' da', 'da.dealer=d.id')
+                    ->where([
+                        'd.id' => $this->id
+                    ])->one();
+
+    }
+
 }

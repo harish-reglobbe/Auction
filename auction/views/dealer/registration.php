@@ -1,34 +1,61 @@
 <?php
 
+
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 use auction\components\Auction;
+use yii\widgets\ActiveForm;
+use yii\bootstrap\Alert;
 
-/* @var $this yii\web\View */
-/* @var $model frontend\models\Dealers */
-/* @var $form ActiveForm */
+$this->title = Auction::$app->name.' :: Dealer Registration';
+
 ?>
-<div class="dealer-registration">
-
+<div class="row">
     <?php if(Auction::$app->session->hasFlash('success')):?>
-        Your Account is Successfully Created.Check Your Email Address to complete your Account Activation
 
-    <?php else:?>
+        <?php Alert::begin([
+            'options' => [
+                'class' => 'alert-success',
+            ],
+        ]);
 
-    <?php $form = ActiveForm::begin(); ?>
+        echo 'Dealer Registration Success';
 
-    <?= $form->field($model, 'name') ?>
-    <?= $form->field($model, 'city') ?>
-    <?= $form->field($model, 'contact') ?>
-    <?= $form->field($model, 'login_name') ?>
-    <?= $form->field($model, 'email') ?>
-    <?= $form->field($model, 'password') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
-    </div>
-    <?php ActiveForm::end(); ?>
+        Alert::end();?>
 
     <?php endif;?>
+    <div class="col-md-6 "><!--Add col-md-offset-3 to make it in center-->
+        <div class="login-panel panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Dealer Registration</h3>
+            </div>
+            <div class="panel-body">
+                <?php $form = ActiveForm::begin([
+                    'id' => 'login-form',
+                    'successCssClass' => false,
+                    'fieldClass' => 'auction\widgets\ActiveField',
+                    'options'=> ['role' => 'form' ,'enctype' => 'multipart/form-data']]); ?>
+                <fieldset>
 
-</div><!-- dealer-registration -->
+                    <?= $form->field($model, 'name')->textInput() ?>
+
+                    <?= $form->field($model, 'password')->passwordInput() ?>
+
+                    <?= $form->field($model, 'mobile')->textInput() ?>
+
+                    <?= $form->field($model, 'city')->textInput() ?>
+
+                    <?= $form->field($model, 'image')->fileInput(['class' => false]) ?>
+
+                    <?= $form->field($model, 'email')->textInput() ?>
+
+                    <?= $form->field($model, 'address')->textarea(['rows' => 6]) ?>
+
+                    <?= Html::submitButton('Register As Dealer',['class' => 'btn btn-lg btn-info btn-block'])?>
+
+                </fieldset>
+                <?php ActiveForm::end(); ?>
+
+            </div>
+        </div>
+    </div>
+</div>

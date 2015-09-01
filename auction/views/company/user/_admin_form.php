@@ -2,15 +2,16 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use auction\components\helpers\DatabaseHelper;
 use yii\widgets\Pjax;
+use auction\components\helpers\DatabaseHelper;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $model auction\models\Users */
+/* @var $model auction\models\Brands */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="users-form">
+<div class="brands-active-form">
 
     <?php Pjax::begin(['id' => 'brand-form','enablePushState' => false, 'timeout' => false])?>
 
@@ -30,8 +31,7 @@ use yii\widgets\Pjax;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true,'disabled' => true]) ?>
 
-    <?= $form->field($model, 'is_active')->dropDownList(DatabaseHelper::Status()) ?>
-
+    <?= $form->field($model, 'is_active')->dropDownList(DatabaseHelper::Status())->label('Status') ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -16,6 +16,8 @@ use auction\models\Users;
 use yii\base\Model;
 use auction\components\Events;
 use auction\components\EventHandler;
+use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
 
 
 class CompanyRegistration extends Model{
@@ -25,25 +27,31 @@ class CompanyRegistration extends Model{
     public $contact;
     public $mobile;
     public $description;
-    public $image;
-    public $login_name;
+    public $profile_pic;
     public $email;
     public $password;
     public $last_visited;
     public $last_login_ip;
+    public $address;
+
+    private $_uploadDirectory;
 
     public function init(){
         //Registering create_company Event
         $this->on(Events::CREATE_COMPANY, [EventHandler::className(), 'RegisterCompany']);
+        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
     }
 
     //Model Rules
     public function rules(){
         return [
-            [['name','domain','contact','mobile','login_name','email','password','description'],'required'],
-            [['name','domain','contact','login_name','email'], 'trim'],
+            [['name','domain','mobile','email','password','description'],'required'],
+            [['name','domain','contact','email'], 'trim'],
+            ['address' , 'safe'],
             ['email','email'],
-            ['login_name','unique','targetClass' => Users::className(), 'targetAttribute' => 'name']
+            [['mobile','contact'] ,'number'],
+            ['profile_pic', 'image'],
+            ['email','unique','targetClass' => Users::className(), 'targetAttribute' => 'email']
         ];
     }
 
@@ -64,7 +72,7 @@ class CompanyRegistration extends Model{
 
     /**
      * trigger Event Assigned on Events::CREATE_Company
-     * Events Defined In frontened/components/Events
+     * Events Defined In auction/components/Events
      */
     public function afterValidate(){
         $this->trigger(Events::CREATE_COMPANY);
@@ -119,6 +127,8 @@ class CompanyRegistration extends Model{
         $user->mobile=$this->mobile;
         $user->is_active=DatabaseHelper::IN_ACTIVE;
 
+        $user->profile_pic = $this->profile_pic;
+
         if (!$user->save(false)) {
             return null;
         }
@@ -139,5 +149,45 @@ class CompanyRegistration extends Model{
         }
 
         return $company;
+    }
+
+    public function validate(){
+        $this->profile_pic=UploadedFile::getInstance($this,'image');
+
+        if(!parent::validate())
+            return false;
+
+        if($this->profile_pic instanceof UploadedFile){
+
+            if(!getimagesize($this->image->tempName)){
+                $this->addError('image','Please Upload a valid Image');
+                return false;
+            }
+
+            $uploadDirectory= $this->UploadDirectory();
+
+            if(!is_dir($uploadDirectory)){
+                FileHelper::createDirectory($uploadDirectory);
+            }
+
+            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
+
+            $this->profile_pic->saveAs($uploadDirectory.$imageName);
+            $this->profile_pic=$imageName;
+            $this->trigger(Events::SAVE_UPLOAD_THUMB);
+
+        }
+        return true;
+
+    }
+
+    public function UploadDirectory(){
+
+        if($this->_uploadDirectory === null){
+            $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/company/';
+        }
+
+        return $this->_uploadDirectory;
+
     }
 }

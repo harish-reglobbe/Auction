@@ -7,6 +7,8 @@ use auction\models\forms\PasswordReset;
 
 class ResetPasswordController extends \yii\web\Controller
 {
+    public $layout = 'login';
+
     public function actionIndex()
     {
         $model = new PasswordReset();
@@ -17,7 +19,6 @@ class ResetPasswordController extends \yii\web\Controller
                 Auction::$app->getSession()->setFlash('error', 'Sorry, we are unable to reset password for email/mobile provided.May be Provided Email/mobile not exist');
             }
 
-            //refresh controller form submission
             return $this->refresh();
         }
 

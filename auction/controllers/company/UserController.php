@@ -80,9 +80,10 @@ class UserController extends Controller
     {
         $model = new Users();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->SaveCompanyUser()) {
             return 'SuccessFully Created';
         } else {
+            //dump($model->getErrors());
             return $this->renderPartial('_form', [
                 'model' => $model,
             ]);
@@ -106,7 +107,7 @@ class UserController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return 'Successfully Updated';
             } else {
-                return $this->renderPartial('_form', [
+                return $this->renderPartial('_admin_form', [
                     'model' => $model,
                 ]);
             }

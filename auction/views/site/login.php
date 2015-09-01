@@ -19,23 +19,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="panel-body">
                 <?php $form = ActiveForm::begin([
                     'id' => 'login-form',
+                    'fieldClass' => 'auction\widgets\ActiveField',
                     'successCssClass' => false,
                     'options'=> ['role' => 'form']]); ?>
                 <fieldset>
 
-                <?= $form->field($model, 'username',[
-                    'errorOptions' => [
-                        'class' => 'error',
-                        'tag' => 'span'
-                    ]
-                ])->label(false)->textInput(['placeholder' => 'Email/Mobile Number','autofocus' => 'autofocus']) ?>
+                <?= $form->field($model, 'username')->textInput(['placeholder' => 'Email/Mobile Number']) ?>
 
-                <?= $form->field($model, 'password',[
-                    'errorOptions' => [
-                        'class' => 'error',
-                        'tag' => 'span'
-                    ]
-                ])->label(false)->passwordInput(['placeholder' => 'Password']) ?>
+                <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Password']) ?>
 
 
                     <div class="checkbox login-checks">
@@ -49,7 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 </fieldset>
                 <?php ActiveForm::end(); ?>
-
+                <?= Html::a('<i class="fa fa-pinterest"></i>Register as Dealer',['dealer/registration'], ['class' => 'btn btn-block btn-social btn-pinterest']); ?>
+                <?= Html::a('<i class="fa fa-bitbucket"></i>Register as Company',['company/registration'], ['class' => 'btn btn-block btn-social btn-dropbox']); ?>
             </div>
         </div>
     </div>

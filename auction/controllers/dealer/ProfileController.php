@@ -12,6 +12,7 @@ use yii\filters\AccessControl;
 class ProfileController extends \yii\web\Controller
 {
     //Behaviour to Apply Access Filtering
+
     public function behaviors(){
         return [
             'access' => [
@@ -54,20 +55,6 @@ class ProfileController extends \yii\web\Controller
          */
         $query= Dealers::find()->joinWith([
             'user0',
-            'dealerSecurities',
-            'dealerPreferences' => function($query){
-                $query->with([
-                    'category0',
-                    'brand0'
-                ]);
-            },
-            'dealerCompanies' => function($query){
-                $query->joinWith([
-                    'company0',
-                    'dealerCompanyPreferences' => function($query){
-                    }
-                ]);
-            },
         ])->where([
             'user' => Auction::$app->user->id
         ]);

@@ -15,30 +15,37 @@ use auction\models\Dealers;
 use yii\base\Exception;
 use yii\base\Model;
 use auction\models\Users;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 class DealerRegistration extends Model{
 
     public $name;
     public $city;
-    public $contact;
-    public $login_name;
+    public $mobile;
     public $email;
     public $password;
     public $last_visited;
     public $last_login_ip;
+    public $image;
+    public $address;
+
+    private $_uploadDirectory;
 
     public function init(){
         $this->on(Events::CREATE_DEALER, [EventHandler::className(), 'RegisterDealer']);
+        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
     }
 
     //Model Rules
     public function rules(){
         return [
-            [['name','city','contact','login_name','email','password'],'required'],
-            [['name','city','contact','login_name','email'], 'trim'],
+            [['name','city','mobile','email','password'],'required'],
+            [['name','city','mobile','email'], 'trim'],
             ['email','email'],
-            //['city','string','min' => 2,'message' => 'City Is Too Short',],
-            ['login_name','unique','targetClass' => Users::className(), 'targetAttribute' => 'name']
+            ['image', 'image'],
+            ['address' , 'safe'],
+            ['email','unique','targetClass' => Users::className(), 'targetAttribute' => 'email']
         ];
     }
 
@@ -47,10 +54,11 @@ class DealerRegistration extends Model{
         return [
             'name' => 'Dealer Name',
             'city' => 'City',
-            'contact' => 'Contact Number',
+            'mobile' => 'Contact Number',
             'login_name' => 'Username',
             'email' => 'Email',
-            'password' => 'Password'
+            'password' => 'Password',
+            'address' => 'Address'
         ];
     }
 
@@ -77,23 +85,25 @@ class DealerRegistration extends Model{
             $transaction = Auction::$app->db->beginTransaction();
             try {
                 $user=$this->SaveUser();
-
+//
                 if(!$user){
                     return null;
                 }
 
                 $dealer = new Dealers();
                 $dealer->name = $this->city;
-                $dealer->contact = $this->contact;
+                $dealer->contact = $this->mobile;
                 $dealer->city = $this->city;
                 $dealer->user=$user->primaryKey;
+                $dealer->address = $this->address;
 
                 if (!$dealer->save(false)) {
                     return null;
                 }
 
                 $transaction->commit();
-                return $user;
+
+                return true;
 
             } catch (Exception $ex) {
                 $transaction->rollBack();
@@ -112,14 +122,56 @@ class DealerRegistration extends Model{
         $user->last_login_ip = $this->last_login_ip;
         $user->last_login = $this->last_visited;
         $user->user_role=DatabaseHelper::DEALER;
-        $user->mobile=$this->contact;
+        $user->mobile=$this->mobile;
+
         $user->is_active=DatabaseHelper::IN_ACTIVE;
+        $user->profile_pic = $this->image;
 
         if (!$user->save(false)) {
             return null;
         }
 
         return $user;
+    }
+
+    public function validate(){
+        $this->image=UploadedFile::getInstance($this,'image');
+
+        if(!parent::validate())
+            return false;
+
+        if($this->image instanceof UploadedFile){
+
+            if(!getimagesize($this->image->tempName)){
+                $this->addError('image','Please Upload a valid Image');
+                return false;
+            }
+
+            $uploadDirectory= $this->UploadDirectory();
+
+            if(!is_dir($uploadDirectory)){
+                FileHelper::createDirectory($uploadDirectory);
+            }
+
+            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
+
+            $this->image->saveAs($uploadDirectory.$imageName);
+            $this->image=$imageName;
+            $this->trigger(Events::SAVE_UPLOAD_THUMB);
+
+        }
+        return true;
+
+    }
+
+    public function UploadDirectory(){
+
+        if($this->_uploadDirectory === null){
+            $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/dealers/';
+        }
+
+        return $this->_uploadDirectory;
+
     }
 
 }

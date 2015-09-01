@@ -69,12 +69,13 @@ class Users extends User
     public function rules()
     {
         return [
-            [['name', 'email', 'mobile', 'password', 'user_role', 'created_at', 'updated_at'], 'required'],
+            [['name', 'email', 'mobile', 'user_role'], 'required'],
             [['last_login', 'created_at', 'updated_at'], 'safe'],
             [['is_active'], 'integer'],
             [['name', 'email', 'mobile', 'password', 'profile_pic', 'auth_key'], 'string', 'max' => 255],
             [['last_login_ip'], 'string', 'max' => 15],
-            [['user_role'], 'string', 'max' => 25]
+            [['user_role'], 'string', 'max' => 25],
+            ['email' ,'email']
         ];
     }
 
@@ -164,7 +165,8 @@ class Users extends User
     public static function findByUsername($username)
     {
         return static::find()->joinWith([
-            'company'
+            'company',
+            'dealers'
         ])->where([
             'users.is_active' => DatabaseHelper::ACTIVE,
         ])->andWhere([
@@ -205,5 +207,19 @@ class Users extends User
 
     }
 
+    public function SaveCompanyUser(){
+        $this->user_role = DatabaseHelper::COMPANY_USER;
+
+        if($this->save()){
+            $model = new CompanyUsers();
+            $model->user = $this->id;
+            $model->company = Auction::$app->session->get('user.company');
+
+            $model->save();
+            return true;
+        }
+
+        return false;
+    }
 
 }

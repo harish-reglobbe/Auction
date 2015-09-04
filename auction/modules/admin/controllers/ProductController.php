@@ -38,7 +38,6 @@ class ProductController extends Controller
      */
     public function actionIndex()
     {
-
         $searchModel =new SearchProduct();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -73,7 +72,7 @@ class ProductController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return "Success";
         } else {
-            return $this->render('_form', [
+            return $this->renderPartial('_form', [
                 'model' => $model,
             ]);
         }
@@ -106,6 +105,7 @@ class ProductController extends Controller
      */
     public function actionDelete()
     {
+
         $id=Auction::$app->request->post('id');
 
         if($id) {
@@ -136,19 +136,13 @@ class ProductController extends Controller
     public function actionUpload(){
         $model= new Products();
 
-        /*$validator = new FileValidator([
-            'extensions' => ['csv'],
-            'maxSize' => 1024*1024
-        ]);*/
-
-
         $columns= CSVColumns::ProductCSVColumn();
 
         if(isset($_POST['Products'])){
             $fileInstance=UploadedFile::getInstance($model, 'productCSV');
             $csvData= new ReadCsv($fileInstance);
 
-            if($csvData->noOfColumns !== $columns)
+            if($csvData->noOfColumns !== $columns->count)
                 throw new HttpException(400, 'Check Your CSV Upload File Columns');
 
             $model->uploadCsvFile($csvData->data);
@@ -168,6 +162,6 @@ class ProductController extends Controller
         $csv = new ParseCSV();
 
         $columns= CSVColumns::ProductCSVColumn(true);
-        $csv->output('movies.csv', [], $columns, ',');
+        $csv->output('Products.csv', [], $columns, ',');
     }
 }

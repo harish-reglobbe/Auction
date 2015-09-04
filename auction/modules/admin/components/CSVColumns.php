@@ -12,22 +12,17 @@ use yii\data\ArrayDataProvider;
 
 class CSVColumns {
 
-    public static function ProductCSVColumn($asArray=false)
+    public static function ProductCSVColumn()
     {
         $columns= [
             'Name',
             'Image',
             'Brand',
             'Category',
-            'Lot',
             'Prize',
             'Condition',
             'Extra Condition'
         ];
-
-        if($asArray){
-            return $columns;
-        }
 
         return new ArrayDataProvider([
             'allModels' => $columns,

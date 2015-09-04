@@ -34,7 +34,7 @@ class Lots extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'auction', 'condition', 'lot_size', 'is_quantity'], 'required'],
+            [['name', 'auction', 'condition'], 'required'],
             [['auction', 'lot_size', 'is_quantity'], 'integer'],
             [['name', 'condition'], 'string', 'max' => 255]
         ];

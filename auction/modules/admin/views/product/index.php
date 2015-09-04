@@ -1,6 +1,9 @@
 <?php
 
 use auction\widgets\grid\GridView;
+use yii\helpers\Html;
+use yii\web\JsExpression;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel auction\models\forms\SearchBrand */
@@ -27,17 +30,17 @@ $this->title='Products';
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\CheckboxColumn'],
 
                         'name',
-//                        'description:ntext',
-//                        ['class' => 'auction\widgets\grid\ImageColumn',],
-//                        [
-//                            'class' => 'auction\widgets\grid\DatePickerColumn',
-//                            'dateColumn' => 'create_date'
-//                        ],
-//                        ['class' => 'auction\widgets\grid\StatusColumn'],
-
+                        [
+                            'class' => 'auction\widgets\grid\ImageColumn',
+                            'path' => 'products'
+                        ],
+                        'brand0.name',
+                        'category0.name',
+                        'prize',
+                        'condition',
                         [
                             'class' => 'auction\components\helpers\ActionColumn',
                             'template' => '{view}{update}'
@@ -46,6 +49,18 @@ $this->title='Products';
                 ]); ?>
 
             </div>
+            <?= Html::button('Delete Selected',['class' => 'btn btn-info', 'onclick' => new JsExpression('
+                var id = $("#dataTables-example").yiiGridView("getSelectedRows");
+                alert(id);
+                $.ajax({
+                type : "post",
+                url  :  "'. Url::to(['delete']) .'",
+                data : {id : id},
+                success : function(data){
+                        $.pjax.reload({container:"#pjax-gridview",timeout:2e3});
+                }
+                });
+            ')]);?>
             <!-- /.panel-body -->
         </div>
         <!-- /.panel -->
@@ -55,9 +70,9 @@ $this->title='Products';
 <!-- /.row -->
 <?php
 $this->registerJs('
-    jQuery(document).on("pjax:success", "#brand-form",  function(event){$.pjax.reload({container:"#pjax-gridview",timeout:2e3}),$("#activity-modal").modal("hide")});
-    jQuery(document).pjax("#brand-form a", "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});
-    jQuery(document).on("submit", "#brand-form form[data-pjax]", function (event) {jQuery.pjax.submit(event, "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});});
+jQuery(document).on("pjax:success", "#brand-form",  function(event){$.pjax.reload({container:"#pjax-gridview",timeout:2e3}),$("#activity-modal").modal("hide")});
+jQuery(document).pjax("#brand-form a", "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});
+jQuery(document).on("submit", "#brand-form form[data-pjax]", function (event) {jQuery.pjax.submit(event, "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});});
     ');
 ?>
 

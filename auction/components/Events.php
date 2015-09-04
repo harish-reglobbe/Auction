@@ -20,4 +20,6 @@ class Events extends Event{
 
     const SAVE_UPLOAD_THUMB = 'upload_thumb';
 
+    const UPLOAD_IMAGE = 'upload_image';
+
 }

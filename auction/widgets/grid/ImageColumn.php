@@ -19,10 +19,11 @@ class ImageColumn extends StatusColumn{
     public $statusColumn = 'image';
 
     public $directory;
+    public $path='brands';
 
 
     public function init(){
-        $this->directory = Auction::$app->request->baseUrl.'/uploads/brands/thumbs/';;
+        $this->directory = Auction::$app->request->baseUrl.'/uploads/'.$this->path.'/thumbs/';
         parent::init();
     }
 

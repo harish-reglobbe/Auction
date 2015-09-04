@@ -2,11 +2,15 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
-use common\components\JAPI;
+use auction\components\JAPI;
+use yii\web\HttpException;
+use yii\web\UploadedFile;
 use Yii;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use auction\components\Events;
+use auction\components\EventHandler;
 
 /**
  * This is the model class for collection "products".
@@ -27,8 +31,13 @@ use yii\helpers\Json;
 class Products extends \yii\mongodb\ActiveRecord
 {
     public $productCSV=null;
-    private $_request;
 
+    private $_request;
+    private $_uploadDirectory;
+
+    public function init(){
+        $this->on(Events::UPLOAD_IMAGE, [EventHandler::className(), 'UploadImage']);
+    }
     /**
      * @inheritdoc
      */
@@ -67,10 +76,11 @@ class Products extends \yii\mongodb\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'brand_id', 'cat_id', 'lot_id', 'prize',], 'required'],
-            //['image' , 'file' ,'skipOnEmpty' => false],
+            [['name', 'brand_id', 'cat_id', 'prize','condition'], 'required'],
+            ['prize' , 'integer', 'min' => 1],
+            ['image', 'image'],
             ['productCSV', 'file', 'extensions' => ['csv'], 'maxSize' => 1024*1024 ],
-            [[ 'condition', 'extra_cond'], 'safe']
+            [[ 'extra_cond'], 'safe']
         ];
     }
 
@@ -85,7 +95,6 @@ class Products extends \yii\mongodb\ActiveRecord
             'image' => 'Image',
             'brand_id' => 'Brand',
             'cat_id' => 'Category',
-            'lot_id' => 'Lot',
             'prize' => 'Prize',
             'condition' => 'Condition',
             'extra_cond' => 'Extra Condition',
@@ -96,14 +105,32 @@ class Products extends \yii\mongodb\ActiveRecord
     /**  Save Product Model**/
     public function save($runValidation = true, $attributeNames = null){
 
+        $this->image=UploadedFile::getInstance($this,'image');
+
+        if(!parent::validate()){
+            return false;
+        }
+
+        if($this->image instanceof UploadedFile){
+
+            if(!getimagesize($this->image->tempName)){
+                $this->addError('image','Please Upload a valid Image');
+                Yii::error('Not a Valid Image Format For Product');
+                return false;
+            }
+
+            $this->trigger(Events::UPLOAD_IMAGE);
+            Yii::info('Trigger Upload Image Event for Products Photo');
+
+        }
+
         $this->doMasking();
 
-        $request = new \HttpRequest(DatabaseHelper::JAVA_API_PRODUCT_URL, HTTP_METH_POST);
-        $request->setRawPostData($this->_request);
-        $request->send();
-        $response = $request->getResponseBody();
+        $request = new JAPI();
+        $response=$request->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
 
-        dump($response);
+        return Json::decode($response);
+
 
     }
 
@@ -111,12 +138,10 @@ class Products extends \yii\mongodb\ActiveRecord
     public static function deleteAll($condition = [], $options = []){
 
         //new HttpGet(API_URL+"/users/otp.json?pid=Xi32jNW0&pid=jl2S7dLp&pid=ycQOmNA3");
-        $url=DatabaseHelper::JAVA_API_PRODUCT_URL;
+        $url='?';
 
-        if(is_string($condition)){
-            $url.='pid='.$condition;
-        }
-        elseif(is_array($condition)){
+        if(is_array($condition)){
+
             foreach($condition as $pId){
                 $url.='pid='.$pId.'&';
             }
@@ -124,9 +149,11 @@ class Products extends \yii\mongodb\ActiveRecord
             $url=substr($url,0,-1);
         }
 
-        $client = new JAPI();
-        $response=$client->process($url,JAPI::HTTP_METHOD_DELETE);
-        dump($response);
+        $request = new JAPI();
+        echo DatabaseHelper::JAVA_API_PRODUCT_URL.$url;
+        $response=$request->process(DatabaseHelper::JAVA_API_PRODUCT_URL.$url,JAPI::HTTP_METHOD_DELETE,[]);
+
+        return Json::decode($response);
 
     }
 
@@ -136,21 +163,24 @@ class Products extends \yii\mongodb\ActiveRecord
      */
     public function uploadCsvFile($data){
 
-        $model = new Products();
         $products=[];
 
         foreach($data as $product){
-            $model->setAttributes($product);
 
-            if($model->validate()){
-                $products=array_combine(self::$APIMask,$product);
+            if($this->validate($product)){
+                $products[]=array_combine(self::$APIMask,$product);
+            }else{
+                throw new HttpException(400, 'You Have An Error in Your Excel');
             }
+
         }
 
         if(count($products) > 0){
+            $this->_request=Json::encode($products);
+
             $client = new JAPI();
-            $response=$client->process('http://http://192.168.1.42:8080/api',JAPI::HTTP_METHOD_GET,$products);
-            dump($response);
+            return $client->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
+
         }
     }
 
@@ -176,9 +206,9 @@ class Products extends \yii\mongodb\ActiveRecord
         $_request=$_data=[];
 
         $_request['pn']=$this->name;
+        $_request['img']=$this->image;
         $_request['bi']=$this->brand_id;
         $_request['ci']=$this->cat_id;
-        $_request['lot_id'] = $this->lot_id;
         $_request['pri']=$this->prize;
         $_request['c']=$this->condition;
         $_request['ec']=$this->extra_cond;
@@ -189,5 +219,27 @@ class Products extends \yii\mongodb\ActiveRecord
 
     }
 
+    public function UploadDirectory(){
+
+        if($this->_uploadDirectory === null){
+            $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/products/';
+        }
+
+        return $this->_uploadDirectory;
+
+    }
+
+
+    public function validate($data = null){
+        $this->name=$data['Name'];
+        $this->image=$data['Image'];
+        $this->brand_id=$data['Brand'];
+        $this->condition=$data['Condition'];
+        $this->extra_cond=$data['Extra Condition'];
+        $this->cat_id=$data['Category'];
+        $this->prize=$data['Prize'];
+
+        return parent::validate();
+    }
 
 }

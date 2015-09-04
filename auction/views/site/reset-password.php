@@ -6,6 +6,7 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use auction\components\helpers\DatabaseHelper;
 
 $this->title = Yii::$app->name. ':: Reset-Password';
 ?>
@@ -24,6 +25,8 @@ $this->title = Yii::$app->name. ':: Reset-Password';
                 <fieldset>
 
                     <?= $form->field($model, 'username')->textInput() ?>
+
+                    <?= $form->field($model, 'via')->radioList(DatabaseHelper::TemplateType()) ?>
 
                     <?= Html::submitButton('Change Password',['class' => 'btn btn-lg btn-info btn-block'])?>
 

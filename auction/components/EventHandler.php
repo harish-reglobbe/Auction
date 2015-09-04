@@ -68,4 +68,23 @@ class EventHandler extends Component{
             ->save($thumbDirectory . $event->sender->image, ['quality' => 50]);
 
     }
+
+    /** Upload Image **/
+
+    public static function UploadImage($event){
+
+        $uploadDirectory= $event->sender->UploadDirectory();
+
+        if(!is_dir($uploadDirectory)){
+            FileHelper::createDirectory($uploadDirectory);
+        }
+
+        $imageName=$event->sender->image->baseName.time().'.'.$event->sender->image->extension;
+
+        $event->sender->image->saveAs($uploadDirectory.$imageName);
+        $event->sender->image=$imageName;
+
+        self::UploadImageThumb($event);
+    }
+
 }

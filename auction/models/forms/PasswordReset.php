@@ -23,10 +23,10 @@ class PasswordReset extends Model
             ['username', 'filter', 'filter' => 'trim'],
             [['username','via'], 'required'],
             ['username','email','when' => function ($model) {return $model->via == 'email';}, 'whenClient' => "function (attribute, value) {return $(#PasswordReset[via]).val() == 'email';}",'message' => 'Must be a Valid Email'],
-            ['username','integer','min' => 10,'max' => 10,'when' => function ($model) {return $model->via == 'sms';}, 'whenClient' => "function (attribute, value) {return $(#PasswordReset[via]).val() == 'sms';}",'message' => 'Must Be a Valid Mobile Number']
-
+            ['username','integer','min' => 10,'max' => 10,'when' => function ($model) {return $model->via == 'sms';}, 'whenClient' => "function (attribute, value) {return $(#PasswordReset[via]).val() == 'sms';}",'message' => 'Must Be a Valid Mobile Number'],
         ];
     }
+
 
     public function attributeLabels(){
         return [

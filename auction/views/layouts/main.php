@@ -79,6 +79,21 @@ AppAsset::register($this);
                             ],
                         ],
                         [
+                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Auction Lots<span class="fa arrow"></span></a>',
+                            'items' => [
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Lots', 'url' => Auction::createUrl('company/lots')],
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Add Products In Lot', 'url' => Auction::createUrl('company/lot-product')],
+                            ],
+                        ],
+                        [
+                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Products<span class="fa arrow"></span></a>',
+                            'items' => [
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Products', 'url' => Auction::createUrl('company/product')],
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Upload CSV', 'url' => Auction::createUrl('company/upload-csv')],
+                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Create Product Cofig', 'url' => Auction::createUrl('company/product-config')],
+                            ],
+                        ],
+                        [
                             'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Setting<span class="fa arrow"></span></a>',
                             'items' => [
                                 ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Update Info', 'url' => Auction::createUrl('company/edit')],

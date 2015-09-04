@@ -14,13 +14,14 @@ use auction\models\Lots;
 
 <div class="brands-active-form">
 
-    <?php //Pjax::begin(['id' => 'brand-form','enablePushState' => false, 'timeout' => false])?>
+    <?php Pjax::begin(['id' => 'brand-form','enablePushState' => false, 'timeout' => false])?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'create-brand',
         //'action' => Url::to(['brand/create']),
         'options' => [
             'data-pjax' => 1,
+            'enctype' => 'multipart/form-data'
         ],
         'enableClientValidation' => false
 
@@ -34,17 +35,19 @@ use auction\models\Lots;
 
     <?= $form->field($model, 'cat_id')->dropDownList(ArrayHelper::map(Categories::find()->asArray()->all(),'id' ,'name')) ?>
 
-    <?= $form->field($model, 'lot_id')->dropDownList(ArrayHelper::map(Lots::find()->asArray()->all(),'id' ,'name')) ?>
+    <?= $form->field($model, 'prize')->textInput() ?>
 
-    <?= $form->field($model, 'condition')->textarea(['row' => 3]) ?>
+    <?= $form->field($model, 'image')->fileInput() ?>
 
-    <?= $form->field($model, 'extra_cond')->textarea(['row' => 5]) ?>
+    <?= $form->field($model, 'condition')->textarea(['row' => 2]) ?>
+
+    <?= $form->field($model, 'extra_cond')->textarea(['row' => 2]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-    <?php //Pjax::end();?>
+    <?php Pjax::end();?>
 
 </div>

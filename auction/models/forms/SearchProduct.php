@@ -16,11 +16,14 @@ class SearchProduct extends Products
      * @inheritdoc
      */
     public $pageSize =10;
+    public $category;
+    public $brand;
+    public $name;
 
     public function rules()
     {
         return [
-            [['_id', 'pageSize',], 'safe'],
+            [['pageSize','category','brand','name'], 'safe'],
         ];
     }
 
@@ -42,7 +45,10 @@ class SearchProduct extends Products
      */
     public function search($params)
     {
-        $query = Products::find();
+        $query = Products::find()->with(
+            'category0',
+            'brand0'
+        );
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -50,18 +56,29 @@ class SearchProduct extends Products
 
         $this->load($params);
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
+        //dump($this);
 
-        $query->andFilterWhere(['like', '_id', $this->_id])
-            ->andFilterWhere(['like', 'id', $this->id])
-            ->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'lot', $this->lot_id])
-            ->andFilterWhere(['like', 'prize', $this->prize]);
+        $dataProvider->pagination->pageSize=$this->pageSize;
+
+        $query->andFilterWhere([
+            'cat_id' => ($this->category) ? intval($this->category) : '',
+            'brand_id' => ($this->brand) ? intval($this->brand) : '',
+        ]);
+
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
+    }
+
+    public function searchLots($params){
+
+        $dataProvider= $this->search($params);
+
+        $dataProvider->query->andWhere([
+            'lot_id' => null
+        ]);
+
+        return $dataProvider;
+
     }
 }

@@ -1,0 +1,95 @@
+<?php
+
+namespace auction\models;
+
+use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+
+/**
+ * This is the model class for table "product_config".
+ *
+ * @property integer $id
+ * @property string $name
+ * @property integer $company
+ * @property integer $cat_id
+ * @property string $created_at
+ * @property string $updated_at
+ *
+ * @property ProdConfName[] $prodConfNames
+ * @property Companies $company0
+ * @property Categories $cat
+ */
+class ProductConfig extends \yii\db\ActiveRecord
+{
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'product_config';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'company',], 'required'],
+            [['company', 'cat_id'], 'integer'],
+            [['created_at', 'updated_at'], 'safe'],
+            [['name'], 'string', 'max' => 255]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'name' => 'Name',
+            'company' => 'Company',
+            'cat_id' => 'Cat ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProdConfNames()
+    {
+        return $this->hasMany(ProdConfName::className(), ['pro_conf_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompany0()
+    {
+        return $this->hasOne(Companies::className(), ['id' => 'company']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCat()
+    {
+        return $this->hasOne(Categories::className(), ['id' => 'cat_id']);
+    }
+}

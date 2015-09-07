@@ -12,7 +12,7 @@ use yii\base\Event;
 
 class Events extends Event{
 
-    const CREATE_DEALER='create_dealer';
+    const REGISTRATION='registration';
 
     const CREATE_COMPANY='create_company';
 
@@ -21,5 +21,9 @@ class Events extends Event{
     const SAVE_UPLOAD_THUMB = 'upload_thumb';
 
     const UPLOAD_IMAGE = 'upload_image';
+
+    const TOKEN_INVALID = 'token_invalid';
+
+    const SEND_RESET_TOKEN = 'send-reset-token';
 
 }

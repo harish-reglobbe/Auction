@@ -17,20 +17,21 @@ use yii\base\Model;
 use auction\components\Events;
 use auction\components\EventHandler;
 use yii\web\UploadedFile;
-use yii\helpers\FileHelper;
-
+use auction\models\AuctionEmails;
 
 class CompanyRegistration extends Model{
+
+    const AFTER_SAVE = 'afterSave';
 
     public $name;
     public $domain;
     public $contact;
     public $mobile;
     public $description;
-    public $profile_pic;
+    public $image;
     public $email;
     public $password;
-    public $last_visited;
+    public $last_login;
     public $last_login_ip;
     public $address;
 
@@ -38,8 +39,9 @@ class CompanyRegistration extends Model{
 
     public function init(){
         //Registering create_company Event
-        $this->on(Events::CREATE_COMPANY, [EventHandler::className(), 'RegisterCompany']);
-        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
+        $this->on(Events::CREATE_COMPANY, [EventHandler::className(), 'Registration']);
+        $this->on(Events::UPLOAD_IMAGE, [EventHandler::className(), 'UploadImage']);
+        $this->on(self::AFTER_SAVE, [$this, 'afterSave']);
     }
 
     //Model Rules
@@ -50,7 +52,7 @@ class CompanyRegistration extends Model{
             ['address' , 'safe'],
             ['email','email'],
             [['mobile','contact'] ,'number'],
-            ['profile_pic', 'image'],
+            ['image', 'image'],
             ['email','unique','targetClass' => Users::className(), 'targetAttribute' => 'email']
         ];
     }
@@ -75,7 +77,10 @@ class CompanyRegistration extends Model{
      * Events Defined In auction/components/Events
      */
     public function afterValidate(){
-        $this->trigger(Events::CREATE_COMPANY);
+        $this->trigger(Events::REGISTRATION);
+        $message = Auction::loggerMessageFormat('Company is Successfully Validated',$this->attributes);
+
+        Auction::info($message);
         return parent::afterValidate();
     }
 
@@ -98,18 +103,22 @@ class CompanyRegistration extends Model{
                 }
 
                 $companyUser=new CompanyUsers();
-                $companyUser->company=$company->id;
-                $companyUser->user=$user->id;
+                $companyUser->company=$company;
+                $companyUser->user=$user;
 
                 if (!$companyUser->save(false)) {
                     return null;
                 }
 
                 $transaction->commit();
-                return $user;
+                $this->trigger(self::AFTER_SAVE);
+                Auction::info('Company Registration Success');
+                return true;
 
             } catch (Exception $ex) {
                 $transaction->rollBack();
+                $_message = Auction::loggerMessageFormat('Company Registration Failed with Following Errors',$this->getErrors());
+                Auction::error($_message);
             }
         }
 
@@ -118,64 +127,45 @@ class CompanyRegistration extends Model{
 
     private function SaveUser(){
         $user = new Users();
-        $user->name = $this->name;
-        $user->email = $this->email;
+        $user->setAttributes($this->getAttributes());
         $user->setPassword($this->password);
-        $user->last_login_ip = $this->last_login_ip;
-        $user->last_login = $this->last_visited;
         $user->user_role=DatabaseHelper::COMPANY_ADMIN;
-        $user->mobile=$this->mobile;
         $user->is_active=DatabaseHelper::IN_ACTIVE;
 
-        $user->profile_pic = $this->profile_pic;
+        $user->profile_pic = $this->image;
 
-        if (!$user->save(false)) {
-            return null;
-        }
-
-        return $user;
+        Auction::info('User Info Saved');
+        return $user->save(false) ? $user->id : false;
     }
 
 
     private function SaveUserCompany(){
         $company = new Companies();
-        $company->name = $this->name;
-        $company->contact = $this->contact;
-        $company->domain=$this->domain;
-        $company->description = $this->description;
+        $company->setAttributes($this->getAttributes());
+        $company->logo_image = $this->image;
 
-        if(!$company->save(false)){
-            return null;
-        }
-
-        return $company;
+        Auction::info('Company Info Saved');
+        return $company->save(false) ? $company->id : false;
     }
 
-    public function validate(){
-        $this->profile_pic=UploadedFile::getInstance($this,'image');
+    public function validate($attributeNames = null, $clearErrors= true){
+        $this->image=UploadedFile::getInstance($this,'image');
 
-        if(!parent::validate())
+        if(!parent::validate($attributeNames, $clearErrors)){
+            $_message = Auction::loggerMessageFormat('Dealer Registration not validated with following Param',$this->attributes());
+
+            Auction::error($_message);
             return false;
+        }
 
-        if($this->profile_pic instanceof UploadedFile){
+        if($this->image instanceof UploadedFile){
 
             if(!getimagesize($this->image->tempName)){
                 $this->addError('image','Please Upload a valid Image');
                 return false;
             }
 
-            $uploadDirectory= $this->UploadDirectory();
-
-            if(!is_dir($uploadDirectory)){
-                FileHelper::createDirectory($uploadDirectory);
-            }
-
-            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
-
-            $this->profile_pic->saveAs($uploadDirectory.$imageName);
-            $this->profile_pic=$imageName;
-            $this->trigger(Events::SAVE_UPLOAD_THUMB);
-
+            $this->trigger(Events::UPLOAD_IMAGE);
         }
         return true;
 
@@ -189,5 +179,22 @@ class CompanyRegistration extends Model{
 
         return $this->_uploadDirectory;
 
+    }
+
+    public function afterSave(){
+        $_model = new AuctionEmails();
+        $_model->message = strtr(MessageTemplate::MessageTemplate(DatabaseHelper::DEALER_REGISTRATION_TEMPLATE),['{name}' => $this->name]);
+        $_model->to = $this->email;
+        $_model->subject = 'Auction :: Company Registration';
+        $_model->from = 'Auction';
+        $_model->status = DatabaseHelper::SEND_MAIL;
+
+        if($_model->save()){
+            Auction::info('Company Registration Email registered');
+        }
+        else {
+            $message= Auction::loggerMessageFormat('Email is not send to user due to following errors',$_model->getErrors());
+            Auction::error($message);
+        }
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "95a86bbb6015cc6fbd9be962a1ab10ae",
+    "hash": "9c0846ac24d0167d47f164cb42776eae",
     "packages": [
         {
             "name": "2amigos/yii2-date-picker-widget",
@@ -328,6 +328,53 @@
             "license": [
                 "MIT"
             ]
+        },
+        {
+            "name": "bupy7/yii2-dynamic-fields",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bupy7/yii2-dynamic-fields.git",
+                "reference": "c2a1afeb242a18461fe2e549d38333814f845d5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bupy7/yii2-dynamic-fields/zipball/c2a1afeb242a18461fe2e549d38333814f845d5e",
+                "reference": "c2a1afeb242a18461fe2e549d38333814f845d5e",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2-bootstrap": "@dev"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "bupy7\\dynafields\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Belosludcev Vasilij",
+                    "email": "bupy765@gmail.com",
+                    "homepage": "http://mihaly4.ru"
+                }
+            ],
+            "description": "Widget for display dynamic fields, adding and removing their use Pjax.",
+            "homepage": "https://github.com/bupy7/yii2-dynamic-fields",
+            "keywords": [
+                "dynamic",
+                "extension",
+                "fields",
+                "multiple",
+                "pjax",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-08-24 10:54:10"
         },
         {
             "name": "cebe/markdown",

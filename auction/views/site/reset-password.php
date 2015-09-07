@@ -26,7 +26,7 @@ $this->title = Yii::$app->name. ':: Reset-Password';
 
                     <?= $form->field($model, 'username')->textInput() ?>
 
-                    <?= $form->field($model, 'via')->radioList(DatabaseHelper::TemplateType()) ?>
+                    <?= $form->field($model, 'via')->radioList(DatabaseHelper::TokenSendingOption()) ?>
 
                     <?= Html::submitButton('Change Password',['class' => 'btn btn-lg btn-info btn-block'])?>
 

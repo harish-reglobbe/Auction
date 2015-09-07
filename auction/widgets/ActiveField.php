@@ -30,6 +30,7 @@ class ActiveField extends \yii\widgets\ActiveField{
      */
     public function label($label = null, $options = [])
     {
+
         $this->parts['{label}'] = '';
 
     }

@@ -43,8 +43,8 @@ class AutoComplete extends \yii\jui\AutoComplete{
         $this->clientOptions =[
             'source' => $this->url,
             'minLength' => 1,
-            'select' => new JsExpression('function(event, data) {$("#'.$this->id.'").val(data.item.name);$(this).data("id",data.item.id);return false;}'),
-            'focus' => new JsExpression('function(event,data){$(this).val(data.item.name);return false;}'),
+            'select' => new JsExpression('function(event, data) {$("#'.$this->id.'").val(data.item.name);$(this).attr("data-id",data.item.id);return false;}'),
+            'focus' => new JsExpression('function(event,data){$(this).val(data.item.name);$(this).attr("data-id",data.item.id);return false;}'),
         ];
 
         $this->renderItem = new JsExpression('.autocomplete("instance")._renderItem = function( ul, item ) {

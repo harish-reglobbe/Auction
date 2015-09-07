@@ -11,21 +11,24 @@ use auction\components\Auction;
 use auction\components\EventHandler;
 use auction\components\Events;
 use auction\components\helpers\DatabaseHelper;
+use auction\models\AuctionEmails;
 use auction\models\Dealers;
+use auction\models\MessageTemplate;
 use yii\base\Exception;
 use yii\base\Model;
 use auction\models\Users;
-use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
 class DealerRegistration extends Model{
+
+    const AFTER_SAVE = 'afterSave';
 
     public $name;
     public $city;
     public $mobile;
     public $email;
     public $password;
-    public $last_visited;
+    public $last_login;
     public $last_login_ip;
     public $image;
     public $address;
@@ -33,8 +36,9 @@ class DealerRegistration extends Model{
     private $_uploadDirectory;
 
     public function init(){
-        $this->on(Events::CREATE_DEALER, [EventHandler::className(), 'RegisterDealer']);
-        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
+        $this->on(Events::REGISTRATION, [EventHandler::className(), 'Registration']);
+        $this->on(Events::UPLOAD_IMAGE, [EventHandler::className(), 'UploadImage']);
+        $this->on(self::AFTER_SAVE, [$this, 'afterSave']);
     }
 
     //Model Rules
@@ -45,7 +49,7 @@ class DealerRegistration extends Model{
             ['email','email'],
             ['image', 'image'],
             ['address' , 'safe'],
-            ['email','unique','targetClass' => Users::className(), 'targetAttribute' => 'email']
+          //  ['email','unique','targetClass' => Users::className(), 'targetAttribute' => 'email']
         ];
     }
 
@@ -68,7 +72,10 @@ class DealerRegistration extends Model{
      * Events Defined In auction/components/Events
      */
     public function afterValidate(){
-        $this->trigger(Events::CREATE_DEALER);
+        $this->trigger(Events::REGISTRATION);
+        $message = Auction::loggerMessageFormat('Dealer is Successfully Validated',$this->attributes);
+
+        Auction::info($message);
         return parent::afterValidate();
     }
 
@@ -79,34 +86,24 @@ class DealerRegistration extends Model{
      * @note User is inserted with dealer role
      */
 
-    public function SaveDealer(){
-
+    public function save(){
         if($this->validate()) {
             $transaction = Auction::$app->db->beginTransaction();
             try {
                 $user=$this->SaveUser();
-//
-                if(!$user){
-                    return null;
-                }
-
-                $dealer = new Dealers();
-                $dealer->name = $this->city;
-                $dealer->contact = $this->mobile;
-                $dealer->city = $this->city;
-                $dealer->user=$user->primaryKey;
-                $dealer->address = $this->address;
-
-                if (!$dealer->save(false)) {
+                if(!$user || !$this->SaveDealer($user)){
                     return null;
                 }
 
                 $transaction->commit();
+                $this->trigger(self::AFTER_SAVE);
+                Auction::info('Dealer Registration Success');
 
                 return true;
-
             } catch (Exception $ex) {
                 $transaction->rollBack();
+                $_message = Auction::loggerMessageFormat('Dealer Registration Failed with Following Errors',$this->getErrors());
+                Auction::error($_message);
             }
         }
 
@@ -116,29 +113,37 @@ class DealerRegistration extends Model{
 
     private function SaveUser(){
         $user = new Users();
-        $user->name = $this->name;
-        $user->email = $this->email;
-        $user->setPassword($this->password);
-        $user->last_login_ip = $this->last_login_ip;
-        $user->last_login = $this->last_visited;
-        $user->user_role=DatabaseHelper::DEALER;
-        $user->mobile=$this->mobile;
+        $user->setAttributes($this->getAttributes());
 
+        $user->setPassword($this->password);
+        $user->user_role=DatabaseHelper::DEALER;
         $user->is_active=DatabaseHelper::IN_ACTIVE;
         $user->profile_pic = $this->image;
 
-        if (!$user->save(false)) {
-            return null;
-        }
-
-        return $user;
+        Auction::info('User Info Saved');
+        return $user->save(false) ? $user->id : false;
     }
 
-    public function validate(){
+    private function SaveDealer($user){
+
+        $dealer = new Dealers();
+        $dealer->setAttributes($this->getAttributes());
+        $dealer->contact = $this->mobile;
+        $dealer->user=$user;
+
+        Auction::info('Dealer Info Saved');
+        return $dealer->save(false) ? $dealer->id : false;
+    }
+
+    public function validate($attributeNames = null, $clearErrors = true){
         $this->image=UploadedFile::getInstance($this,'image');
 
-        if(!parent::validate())
+        if(!parent::validate($attributeNames, $clearErrors)){
+            $_message = Auction::loggerMessageFormat('Dealer Registration not validated with following Param',$this->attributes());
+
+            Auction::error($_message);
             return false;
+        }
 
         if($this->image instanceof UploadedFile){
 
@@ -147,21 +152,9 @@ class DealerRegistration extends Model{
                 return false;
             }
 
-            $uploadDirectory= $this->UploadDirectory();
-
-            if(!is_dir($uploadDirectory)){
-                FileHelper::createDirectory($uploadDirectory);
-            }
-
-            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
-
-            $this->image->saveAs($uploadDirectory.$imageName);
-            $this->image=$imageName;
-            $this->trigger(Events::SAVE_UPLOAD_THUMB);
-
+            $this->trigger(Events::UPLOAD_IMAGE);
         }
         return true;
-
     }
 
     public function UploadDirectory(){
@@ -174,4 +167,20 @@ class DealerRegistration extends Model{
 
     }
 
+    public function afterSave(){
+        $_model = new AuctionEmails();
+        $_model->message = strtr(MessageTemplate::MessageTemplate(DatabaseHelper::DEALER_REGISTRATION_TEMPLATE),['{name}' => $this->name]);
+        $_model->to = $this->email;
+        $_model->subject = 'Auction :: Dealer Registration';
+        $_model->from = 'Auction';
+        $_model->status = DatabaseHelper::SEND_MAIL;
+
+        if($_model->save()){
+            Auction::info('Dealer Registration Email registered');
+        }
+        else {
+            $message= Auction::loggerMessageFormat('Email is not send to user due to following errors',$_model->getErrors());
+            Auction::error($message);
+        }
+    }
 }

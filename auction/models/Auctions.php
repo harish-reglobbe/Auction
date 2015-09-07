@@ -3,6 +3,7 @@
 namespace auction\models;
 
 use Yii;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "{{%auctions}}".
@@ -121,5 +122,21 @@ class Auctions extends \yii\db\ActiveRecord
     public function getLots()
     {
         return $this->hasMany(Lots::className(), ['auction' => 'id']);
+    }
+
+    /**
+     * @param $id company Id whose Auctions to be retured
+     * @return activedataprovider instance
+     * limit is setted as 3
+     */
+    public static function latestCompanyAuction($id){
+
+        $query =  self::find()->where([
+            'company' => $id
+        ])->limit(3);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 }

@@ -5,6 +5,7 @@ namespace auction\models;
 use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
 use auction\components\JAPI;
+use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use yii\web\UploadedFile;
 use Yii;
@@ -168,12 +169,14 @@ class Products extends \yii\mongodb\ActiveRecord
         foreach($data as $product){
 
             if($this->validate($product)){
-                $products[]=array_combine(self::$APIMask,$product);
+                $products[]=ArrayHelper::merge(array_combine(self::$APIMask,$product),['cId' => Auction::company()]);
             }else{
                 throw new HttpException(400, 'You Have An Error in Your Excel');
             }
 
         }
+
+        dump($products);
 
         if(count($products) > 0){
             $this->_request=Json::encode($products);
@@ -212,6 +215,7 @@ class Products extends \yii\mongodb\ActiveRecord
         $_request['pri']=$this->prize;
         $_request['c']=$this->condition;
         $_request['ec']=$this->extra_cond;
+        $_request['cId'] = Auction::company();
 
         $_data[] = $_request;
 

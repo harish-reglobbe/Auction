@@ -162,19 +162,22 @@ class Users extends User
      * @param string $username/mobile
      * @return static|null
      */
-    public static function findByUsername($username)
+    public static function findByUsername($username,$isActive = true)
     {
-        return static::find()->joinWith([
-            'company',
-            'dealers'
-        ])->where([
-            'users.is_active' => DatabaseHelper::ACTIVE,
-        ])->andWhere([
+        $query =  static::find()->where([
             'or', 'users.email=:email', 'users.mobile=:mobile'
         ])->addParams([
             ':email' => $username,
             ':mobile' => $username
-        ])->one();
+        ]);
+
+        if($isActive){
+            $query->andWhere([
+                'users.is_active' => DatabaseHelper::ACTIVE,
+            ]);
+        }
+
+        return $query->one();
     }
 
     /**
@@ -197,14 +200,16 @@ class Users extends User
     }
 
     /**  Last Reset Password token of user */
-    public function getToken(){
+    public function Token($via){
+        if($via == 'email'){
+            $config['class'] = ForgotPasswordHistory::className();
+        }
+        else{
+            $config['class'] = OptHistory::className();
+        }
 
-       return $this->hasOne(ForgotPasswordHistory::className(),['user' => 'id'])
-           ->where(
-               'valid_till >=NOW() and status=:status'
-               ,[':status' => DatabaseHelper::ACTIVE])
-           ->orderBy('create_date desc')->limit(1);
-
+        $config['userObject'] = $this;
+        return Auction::createObject($config);
     }
 
     public function SaveCompanyUser(){

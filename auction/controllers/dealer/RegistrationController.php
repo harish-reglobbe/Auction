@@ -17,11 +17,8 @@ class RegistrationController extends \yii\web\Controller
 
         $model = new DealerRegistration();
 
-        if ($model->load(Auction::$app->request->post())) {
-            if ($user = $model->SaveDealer()) {
-                Auction::$app->session->setFlash('success', 'Thank you ');
-            }
-
+        if ($model->load(Auction::$app->request->post()) && $model->save()) {
+            Auction::$app->session->setFlash('success', 'Thank you For Registration Check Your Email to activate Your Account');
             return $this->refresh();
         }
 

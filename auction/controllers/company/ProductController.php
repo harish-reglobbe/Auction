@@ -2,6 +2,7 @@
 
 namespace auction\controllers\company;
 
+use auction\components\Auction;
 use Yii;
 use auction\models\Products;
 use auction\models\forms\SearchProduct;
@@ -63,9 +64,9 @@ class ProductController extends Controller
         $model = new Products();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => (string)$model->_id]);
+            return $this->actionIndex();
         } else {
-            return $this->render('create', [
+            return $this->render('_form', [
                 'model' => $model,
             ]);
         }
@@ -96,11 +97,13 @@ class ProductController extends Controller
      * @param integer $_id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
-        $this->findModel($id)->delete();
+        $id=Auction::$app->request->post('id');
 
-        return $this->redirect(['index']);
+        if($id) {
+            Products::deleteAll($id);
+        }
     }
 
     /**
@@ -112,7 +115,7 @@ class ProductController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Products::findOne($id)) !== null) {
+        if (($model = Products::find()->where(['product_id' => $id])->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -32,7 +32,8 @@ class DealerCompanyPreferences extends \yii\db\ActiveRecord
     {
         return [
             [['dc_id', 'category'], 'required'],
-            [['dc_id', 'brand', 'category'], 'integer']
+            [['dc_id', 'brand', 'category'], 'integer'],
+            ['dc_id' , 'auction\models\validators\DealerPrefeneces']
         ];
     }
 
@@ -70,5 +71,10 @@ class DealerCompanyPreferences extends \yii\db\ActiveRecord
     public function getCategory0()
     {
         return $this->hasOne(Categories::className(), ['id' => 'category']);
+    }
+
+
+    public static function primaryKey(){
+        return ['dc_id' , 'brand' , 'category'];
     }
 }

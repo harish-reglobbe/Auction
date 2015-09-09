@@ -17,27 +17,6 @@ use auction\components\helpers\DatabaseHelper;
  */
 class UserController extends Controller
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                // We will override the default rule config with the new AccessRule class
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'actions' => ['index','view','create','delete','update'],
-                        'allow' => true,
-                        'roles' => [
-                            DatabaseHelper::COMPANY_ADMIN
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Lists all Users models.

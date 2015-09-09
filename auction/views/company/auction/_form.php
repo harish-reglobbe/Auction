@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use auction\components\helpers\DatabaseHelper;
 use dosamigos\datepicker\DatePicker;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model auction\models\Auctions */
@@ -50,9 +51,9 @@ use dosamigos\datepicker\DatePicker;
 
     <?= $form->field($model, 'max_extd')->textInput() ?>
 
-    <?= $form->field($model, 'category')->textInput() ?>
+    <?= $form->field($model, 'category')->dropDownList(ArrayHelper::map(\auction\models\Categories::find()->asArray()->all(),'id' , 'name')) ?>
 
-    <?= $form->field($model, 'brand')->textInput() ?>
+    <?= $form->field($model, 'brand')->dropDownList(ArrayHelper::map(\auction\models\Brands::find()->asArray()->all(),'id' , 'name')) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Create' , ['class' => 'btn btn-success']) ?>

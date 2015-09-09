@@ -33,8 +33,8 @@ class AppAsset extends AssetBundle
         'js/metisMenu.js',
         'js/sb-admin-2.js',
         'js/bootstrap.min.js',
-        'js/morris.min.js',
-        'js/raphael-min.js'
+     //   'js/morris.min.js',
+     //   'js/raphael-min.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

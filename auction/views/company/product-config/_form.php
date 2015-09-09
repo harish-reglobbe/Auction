@@ -3,8 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
-use yii\helpers\ArrayHelper;
-use auction\models\Categories;
+use auction\components\Auction;
 
 /* @var $this yii\web\View */
 /* @var $model auction\models\Brands */
@@ -31,7 +30,9 @@ use auction\models\Categories;
 
     <?= $form->field($model, 'typeName')->textInput() ?>
 
-    <?= $form->field($model, 'cat_id')->dropDownList(ArrayHelper::map(Categories::find()->asArray()->all() , 'id', 'name')) ?>
+    <?= $form->field($model, 'cat_id')->dropDownList(Auction::dropDownList('auction\models\Categories' , 'id' ,'name')) ?>
+
+    <?= $form->field($model, 'brand_id')->dropDownList(Auction::dropDownList('auction\models\Brands' , 'id' ,'name')) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->name == '' ? 'Create' : 'Update', ['class' => $model->name == '' ? 'btn btn-success' : 'btn btn-primary']) ?>

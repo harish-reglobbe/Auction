@@ -11,9 +11,9 @@ namespace auction\models\forms;
 
 use auction\components\Auction;
 use auction\models\AuctionPreference;
+use auction\models\Auctions;
 use auction\models\AuctionsCriteria;
 use auction\models\BidsTerm;
-use frontend\models\Auctions;
 use yii\base\Exception;
 use yii\base\Model;
 
@@ -38,7 +38,7 @@ class CreateAuction extends Model{
 
     public function rules(){
         return [
-            [['name','amount','duration','start_date','company','status','priority','security','is_percent','max_bid','cooling_prd','last_min_extd','max_extd','category','brand'],'safe']
+            [['name','amount','duration','start_date','company','status','priority','security','is_percent','max_bid','cooling_prd','last_min_extd','max_extd','category','brand'],'required']
         ];
     }
 
@@ -66,6 +66,7 @@ class CreateAuction extends Model{
     }
 
     public function save(){
+        dump($this);
 
         $transaction=Auction::$app->db->beginTransaction();
         try{

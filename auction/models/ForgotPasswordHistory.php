@@ -3,6 +3,8 @@
 namespace auction\models;
 
 use auction\components\Auction;
+use auction\components\EventHandler;
+use auction\components\Events;
 use auction\components\helpers\DatabaseHelper;
 use Yii;
 use yii\db\Expression;
@@ -24,6 +26,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class ForgotPasswordHistory extends \yii\db\ActiveRecord
 {
+    public $userObject;
+
     public function behaviors()
     {
         return [
@@ -41,6 +45,11 @@ class ForgotPasswordHistory extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return '{{%forgot_password_history}}';
+    }
+
+    public function init(){
+        $this->on(Events::TOKEN_INVALID, [EventHandler::className(), 'TokenInvalid']);
+        $this->on(Events::SEND_RESET_TOKEN, [EventHandler::className(), 'SendResetToken']);
     }
 
     /**
@@ -84,44 +93,29 @@ class ForgotPasswordHistory extends \yii\db\ActiveRecord
 
     /**
      * Generates new password reset token
-     * @param id user id of the user
+     * @param user User Object
      * @return bool status of save model
      */
-    public function generatePasswordResetToken($userId)
+    public function generatePasswordResetToken()
     {
-        $this->makeTokenInValid($userId);
+        $this->trigger(Events::TOKEN_INVALID);
 
-        $_model= new ForgotPasswordHistory();
-        $_model->token = Auction::$app->security->generateRandomString() . '_' . time();
-        $_model->valid_till = Auction::$app->formatter->asDatetime(DatabaseHelper::EMAIL_TOKEN_VALID_TIME);
-        $_model->status = DatabaseHelper::ACTIVE;
-        $_model->user = $userId;
-        $_model->mode= '1';
+        $this->user = $this->userObject->id;
+        $this->token = Auction::$app->security->generateRandomString(6);
+        $this->valid_till = Auction::$app->formatter->asDatetime(DatabaseHelper::EMAIL_TOKEN_VALID_TIME);
+        $this->status = DatabaseHelper::ACTIVE;
+        $this->mode= DatabaseHelper::TOKEN_SEND_MODE_WEB;
 
-        if($_model->save()){
-            return $_model->token;
+        if($this->save()){
+            Auction::infoLog('Token is created with following options ', $this->getAttributes());
+
+            $this->trigger(Events::SEND_RESET_TOKEN);
+            return true;
         }
-
-        return false;
-    }
-
-
-    /**
-     * Finds out if password reset token is valid and make it as invalid Token
-     *
-     * @param string $token password reset token
-     * @return boolean
-     */
-    private function makeTokenInValid($userId)
-    {
-
-        Auction::$app->db->createCommand()->update(self::tableName(),[
-            'status' => DatabaseHelper::IN_ACTIVE
-        ],'user=:user and status=:status',[
-            ':user' => $userId,
-            ':status' => DatabaseHelper::ACTIVE
-        ])->execute();
-
+        else{
+            Auction::errorLog('Token has following validation error  ', $this->getErrors());
+            return false;
+        }
     }
 
 }

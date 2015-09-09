@@ -19,7 +19,12 @@ class UploadCsvController extends \yii\web\Controller
             $fileInstance=UploadedFile::getInstance($model, 'productCSV');
             $csvData= new ReadCsv($fileInstance);
 
-            $model->uploadCsvFile($csvData->data);
+            if($model->uploadCsvFile($csvData->data)){
+                echo 'Successfully Uploaded';
+            }else {
+                echo 'Some Error';
+            }
+
 
         }
 

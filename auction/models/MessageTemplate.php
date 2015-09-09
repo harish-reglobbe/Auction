@@ -2,9 +2,11 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\web\HttpException;
 
 /**
  * This is the model class for table "{{%message_template}}".
@@ -19,15 +21,6 @@ use yii\db\Expression;
  */
 class MessageTemplate extends \yii\db\ActiveRecord
 {
-
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-            ],
-        ];
-    }
 
     /**
      * @inheritdoc
@@ -66,4 +59,16 @@ class MessageTemplate extends \yii\db\ActiveRecord
             'is_active' => 'Is Active',
         ];
     }
+
+    public static function MessageTemplate($name){
+        $message = MessageTemplate::find('name=:name',[':name' => $name])->one();
+
+        if($message){
+            return $message->template;
+        }else{
+            Auction::error('There is no '. $name .' in database create it admin');
+            throw new HttpException(400 ,'No '. $name .' Found Create it');
+        }
+    }
+
 }

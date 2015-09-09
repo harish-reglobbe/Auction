@@ -17,7 +17,9 @@ class CSVColumns {
         $columns= [
             'Name',
             'Image',
-            'Prize',
+            'Brand',
+            'Category',
+            "Price",
             'Condition',
             'Extra Condition'
         ];

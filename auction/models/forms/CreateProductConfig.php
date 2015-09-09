@@ -23,9 +23,11 @@ class CreateProductConfig extends Model{
 
     public $cat_id;
 
+    public $brand_id;
+
     public function rules(){
         return [
-            [['name','typeName','cat_id'] , 'required'],
+            [['name','typeName','cat_id','brand_id'] , 'required'],
         ];
     }
 
@@ -71,6 +73,7 @@ class CreateProductConfig extends Model{
         $model = new ProductConfig();
         $model->name = $this->typeName;
         $model->cat_id = $this->cat_id;
+        $model->brand_id = $this->brand_id;
         $model->company = Auction::$app->session->get('user.company',0);
 
         if($model->save()){

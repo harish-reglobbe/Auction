@@ -64,9 +64,7 @@ class AuctionController extends Controller
         $model = new CreateAuction();
 
         if ($model->load(Yii::$app->request->post())) {
-
-            $id= $model->save();
-            return $this->redirect(['view', 'id' => $id]);
+            return $this->redirect(['view', 'id' => $model->save()]);
         } else {
             return $this->render('create', [
                 'model' => $model,

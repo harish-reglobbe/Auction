@@ -2,8 +2,12 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
+use auction\components\EventHandler;
+use auction\components\Events;
 use Yii;
 use yii\db\Query;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "{{%dealers}}".
@@ -26,6 +30,9 @@ class Dealers extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    private $_uploadDirectory;
+    public $image;
+
     public static function tableName()
     {
         return '{{%dealers}}';
@@ -104,14 +111,58 @@ class Dealers extends \yii\db\ActiveRecord
     public function getDealerDetails(){
 
         return (new Query())->select('Coalesce(ds.security, 0) as `dealerSecurity`,count(dc.id) as dealerCompanies,count(da.dealer) as dealerAuctions')
-                    ->from(Dealers::tableName(). 'd')
-                    ->leftJoin(DealerCompany::tableName().' dc', 'dc.dealer=d.id')
-                    ->leftJoin(DealerSecurity::tableName(). 'ds', 'ds.dealer=d.id')
-                    ->leftJoin(DealerAuctions::tableName().' da', 'da.dealer=d.id')
-                    ->where([
-                        'd.id' => $this->id
-                    ])->one();
+            ->from(Dealers::tableName(). 'd')
+            ->leftJoin(DealerCompany::tableName().' dc', 'dc.dealer=d.id')
+            ->leftJoin(DealerSecurity::tableName(). 'ds', 'ds.dealer=d.id')
+            ->leftJoin(DealerAuctions::tableName().' da', 'da.dealer=d.id')
+            ->where([
+                'd.id' => $this->id
+            ])->one();
 
     }
 
+    public function afterValidate(){
+        $this->on(Events::UPLOAD_IMAGE, [EventHandler::className(), 'UploadImage']);
+    }
+
+    public function update($runValidation = true, $attributeNames = null){
+        $this->image = UploadedFile::getInstance($this->user0, 'profile_pic');
+
+        if(!parent::validate())
+            return false;
+
+        if($this->image instanceof  UploadedFile){
+
+            if(!getimagesize($this->image->tempName)){
+                $this->addError('image','Please Upload a valid Image');
+                return false;
+            }
+
+            Auction::info('Image Upload Event Triggered');
+            $this->trigger(Events::UPLOAD_IMAGE);
+
+            parent::update(false);
+            $this->user0->profile_pic = $this->image;
+        }
+        else{
+            $this->user0->profile_pic = $this->user0->oldAttributes['profile_pic'];
+        }
+
+        if($this->user0->save(false)) {
+            Auction::info('Dealer is successsfully Updated');
+            return true;
+        }else{
+            Auction::infoLog('Dealer is not updated Due to following validation Errors',$this->user0->getErrors());
+            return false;
+        }
+    }
+
+    public function UploadDirectory(){
+
+        if($this->_uploadDirectory === null){
+            $this->_uploadDirectory = Auction::getAlias('@webroot').'/uploads/dealers/';
+        }
+
+        return $this->_uploadDirectory;
+    }
 }

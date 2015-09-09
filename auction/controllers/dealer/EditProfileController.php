@@ -4,11 +4,18 @@ namespace auction\controllers\dealer;
 
 use auction\components\Auction;
 use auction\components\controllers\DealerController;
+use auction\components\helpers\AccessRule;
+use auction\models\DealerCompanyPreferences;
+use auction\models\DealerPreference;
 use auction\models\Dealers;
+use yii\filters\AccessControl;
+use yii\helpers\Json;
+use yii\web\Controller;
 use yii\web\HttpException;
 
-class EditProfileController extends DealerController
+class EditProfileController extends Controller
 {
+
     public function actionIndex()
     {
         $model = $this->loadProfile();
@@ -28,7 +35,13 @@ class EditProfileController extends DealerController
 
     protected function loadProfile(){
         $model = Dealers::find()->joinWith([
-            'user0'
+            'user0',
+            'dealerPreferences' => function($query){
+                $query->with([
+                    'category0',
+                    'brand0'
+                ]);
+            }
         ])->where([
             'dealers.id' => Auction::$app->session->get('user.dealer', 0)
         ])->one();
@@ -39,5 +52,38 @@ class EditProfileController extends DealerController
         }
 
         return $model;
+    }
+
+
+    public function actionAddPreference(){
+        $post = Auction::$app->request->post();
+
+        if($post){
+            $model = new DealerPreference();
+            $model->brand = $post['brand'];
+            $model->category = $post['category'];
+            $model->dealer = Auction::dealer();
+
+            if($model->save()){
+                return $this->actionIndex();
+            }else {
+                throw new HttpException(400, 'Already Exist');
+            }
+        }
+    }
+
+    public function actionDeletePreference(){
+        $post= Auction::$app->request->post('id');
+
+        $post = Json::decode($post,true);
+
+        DealerCompanyPreferences::find()->where([
+            'brand' => $post['brand'],
+            'category' => $post['category'],
+            'dealer' => $post['dealer']
+        ])->one()->delete();
+
+
+        return $this->actionIndex();
     }
 }

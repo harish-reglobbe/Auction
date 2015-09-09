@@ -96,7 +96,7 @@ class SearchUser extends Users
         //Getting Session Value of user.company Saved During Login Time is user is company/company_admin
         $dataProvider->query->andWhere('companies.id=:cid and users.id!=:uid',[
             ':uid' => Auction::$app->user->id,
-            ':cid' => Auction::$app->session->get('user.company',0)
+            ':cid' => Auction::company()
         ]);
 
         return $dataProvider;

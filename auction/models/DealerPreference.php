@@ -32,7 +32,8 @@ class DealerPreference extends \yii\db\ActiveRecord
     {
         return [
             [['dealer', 'category', 'brand'], 'required'],
-            [['dealer', 'category', 'brand'], 'integer']
+            [['dealer', 'category', 'brand'], 'integer'],
+            ['dealer' , 'auction\models\validators\DealerPrefeneces']
         ];
     }
 
@@ -70,5 +71,9 @@ class DealerPreference extends \yii\db\ActiveRecord
     public function getBrand0()
     {
         return $this->hasOne(Brands::className(), ['id' => 'brand']);
+    }
+
+    public static function primaryKey(){
+        return ['dealer','brand','category'];
     }
 }

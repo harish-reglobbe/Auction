@@ -75,7 +75,6 @@ AppAsset::register($this);
                             'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Products<span class="fa arrow"></span></a>',
                             'items' => [
                                 ['label' => '<i class="fa fa-truck fa-fw"></i>List Products', 'url' => Auction::createUrl('admin/product')],
-                                ['label' => '<i class="fa fa-upload fa-fw"></i>Upload Products List', 'url' => Auction::createUrl('admin/product/upload')],
                             ],
                         ],
                         ['label' => '<i class="fa fa-user fa-fw"></i>Users', 'url' => Auction::createUrl('admin/user')],

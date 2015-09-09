@@ -5,6 +5,8 @@ namespace auction\models;
 use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
 use auction\components\JAPI;
+use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use yii\web\UploadedFile;
@@ -33,7 +35,11 @@ class Products extends \yii\mongodb\ActiveRecord
 {
     public $productCSV=null;
 
+
+    private $_categoryList;
+    private $_brandList;
     private $_request;
+    private $_response;
     private $_uploadDirectory;
 
     public function init(){
@@ -54,7 +60,6 @@ class Products extends \yii\mongodb\ActiveRecord
     {
         return [
             '_id',
-            'id',
             'product_id',
             'name',
             'image',
@@ -65,11 +70,19 @@ class Products extends \yii\mongodb\ActiveRecord
             'condition',
             'extra_cond',
             'create_date',
+            'category',
+            'company',
+            'sum',
+            'brand',
+            'summary',
+            'quantity',
+            'c_id'
         ];
     }
 
-    //"pn":"Product","img":"Image path","bi":Brand Id,"ci":CategoryId,"pri":Price,"c":"Condition","ec":"ExtraCondition"
-    static $APIMask=['pn', 'img', 'bi', 'ci', 'pri', 'c', 'ec'];
+    //{"pi":"WVlATED","pn":"Product1","img":"Image path1","bi":1,"bn":"bn1""ci":1,"cn":"cn1","pri":22.02,"c":"Flawless",
+    //"ec":"key1:value1||key2:value2", "pq":20,"cid":"cid1","company":"company1","sum":"sum1"}
+    static $APIMask=['pn', 'img', 'pri', 'c', 'sum' , 'pq', 'bn' , 'bi' , 'cn' , 'cid' ,'company' , 'cid' , 'ec'];
 
     /**
      * @inheritdoc
@@ -77,11 +90,11 @@ class Products extends \yii\mongodb\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'brand_id', 'cat_id', 'prize','condition'], 'required'],
-            ['prize' , 'integer', 'min' => 1],
+            [['name', 'brand_id', 'cat_id', 'prize','condition' ,'summary','quantity'], 'required'],
+            [['prize','quantity'] , 'integer', 'min' => 1],
             ['image', 'image'],
             ['productCSV', 'file', 'extensions' => ['csv'], 'maxSize' => 1024*1024 ],
-            [[ 'extra_cond'], 'safe']
+            [[ 'extra_cond', 'brand' , 'category'], 'safe']
         ];
     }
 
@@ -127,10 +140,10 @@ class Products extends \yii\mongodb\ActiveRecord
 
         $this->doMasking();
 
-        $request = new JAPI();
-        $response=$request->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
 
-        return Json::decode($response);
+        $request = new JAPI();
+        $response = $request->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
+
 
 
     }
@@ -151,7 +164,6 @@ class Products extends \yii\mongodb\ActiveRecord
         }
 
         $request = new JAPI();
-        echo DatabaseHelper::JAVA_API_PRODUCT_URL.$url;
         $response=$request->process(DatabaseHelper::JAVA_API_PRODUCT_URL.$url,JAPI::HTTP_METHOD_DELETE,[]);
 
         return Json::decode($response);
@@ -169,20 +181,20 @@ class Products extends \yii\mongodb\ActiveRecord
         foreach($data as $product){
 
             if($this->validate($product)){
-                $products[]=ArrayHelper::merge(array_combine(self::$APIMask,$product),['cId' => Auction::company()]);
+                $products[] = $this->doMasking();
+
             }else{
-                throw new HttpException(400, 'You Have An Error in Your Excel');
+               dump($this->getErrors());
             }
 
         }
-
-        dump($products);
 
         if(count($products) > 0){
             $this->_request=Json::encode($products);
 
             $client = new JAPI();
-            return $client->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
+            $response=  $client->process(DatabaseHelper::JAVA_API_PRODUCT_URL,JAPI::HTTP_METHOD_POST,[],$this->_request,'application/json');
+            return $this->parseResponse($response);
 
         }
     }
@@ -205,8 +217,7 @@ class Products extends \yii\mongodb\ActiveRecord
     }
 
     private function doMasking(){
-        //'pn', 'img', 'bi', 'ci', 'pri', 'c', 'ec'
-        $_request=$_data=[];
+        $_request=[];
 
         $_request['pn']=$this->name;
         $_request['img']=$this->image;
@@ -215,11 +226,16 @@ class Products extends \yii\mongodb\ActiveRecord
         $_request['pri']=$this->prize;
         $_request['c']=$this->condition;
         $_request['ec']=$this->extra_cond;
-        $_request['cId'] = Auction::company();
+        $_request['cid'] = Auction::company();
+        $_request['company']=Auction::username();
+        $_request['bn'] =$this->brand;
+        $_request['cn'] = $this->category;
+        $_request['sum'] = $this->summary;
+        $_request['pq'] = $this->quantity;
 
-        $_data[] = $_request;
+        return $_request;
 
-        $this->_request=Json::encode($_data);
+//        $this->_request=Json::encode($_data);
 
     }
 
@@ -235,15 +251,62 @@ class Products extends \yii\mongodb\ActiveRecord
 
 
     public function validate($data = null){
+
         $this->name=$data['Name'];
         $this->image=$data['Image'];
-        $this->brand_id=$data['Brand'];
+        $this->prize=$data['Price'];
         $this->condition=$data['Condition'];
-        $this->extra_cond=$data['Extra Condition'];
-        $this->cat_id=$data['Category'];
-        $this->prize=$data['Prize'];
+        $this->summary=$data['Summary'];
+        $this->quantity=$data['Quantity'];
+        $this->brand=implode(array_slice($data, 7, 1),'');
+        $this->brand_id = array_search($this->brand , $this->BrandList());
+        $this->category=implode(array_slice($data, 6, 1),'');
+        $this->cat_id = array_search($this->category , $this->CategoryList());
+        $this->company= Auction::username();
+        $this->c_id = Auction::company();
+
+        $extraCondition = array_slice($data, 8 , count($data));
+
+        $extraCond= '';
+
+        foreach($extraCondition as $key=>$value){;
+            $extraCond.=$key.':'.$value.'||';
+        }
+
+        $this->extra_cond = substr($extraCond, 0, -2);
 
         return parent::validate();
+    }
+
+
+    public function CategoryList(){
+        if($this->_categoryList == null){
+            $this->_categoryList = ArrayHelper::map(Categories::find()->asArray()->all(),'id','name');
+        }
+
+        return $this->_categoryList;
+    }
+
+    public function BrandList(){
+        if($this->_brandList == null){
+            $this->_brandList = Auction::dropDownList('auction\models\Brands' , 'id' ,'name');
+        }
+
+        return $this->_brandList;
+    }
+
+    private function parseResponse($response){
+        try{
+            $this->_response= Json::decode($response ,true);
+        }catch (InvalidParamException $ex){
+            throw new HttpException(400, 'Java Server Error');
+        }
+
+        if(array_key_exists('s' ,$this->_response)){
+            return true;
+        }else {
+            return false;
+        }
     }
 
 }

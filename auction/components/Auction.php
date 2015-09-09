@@ -12,6 +12,7 @@
  */
 
 namespace auction\components;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 use Yii;
 
@@ -54,5 +55,30 @@ class Auction extends Yii{
         $_message = self::loggerMessageFormat($message,$logVars);
 
         self::error($_message);
+    }
+
+    public static function company(){
+        return self::$app->session->get('user.company');
+    }
+
+    public static function user(){
+        return self::$app->user->id;
+    }
+
+    public static function username(){
+        return self::$app->session->get('user.name');
+    }
+
+    public static function dealer(){
+        return self::$app->session->get('user.dealer');
+    }
+
+    public static function dropDownList($class,$key,$value){
+        $array = self::createObject(['class' => $class])->find()->asArray()->all();
+        return ArrayHelper::map($array,$key,$value);
+    }
+
+    public static function userRole(){
+        return self::$app->session->get('user.role');
     }
 }

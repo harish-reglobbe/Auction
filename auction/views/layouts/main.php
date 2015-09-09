@@ -60,47 +60,8 @@ AppAsset::register($this);
 
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse">
-                <?= Menu::widget([
+                <?= \auction\widgets\Menu::widget([
                     'options' => ['class' => 'nav', 'id' => 'side-menu'],
-                    'items' => [
-                        ['label' => '<i class="fa fa-dashboard fa-fw"></i>Dashboard', 'url' => Auction::createUrl('company/info')],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Auctions<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Auctions', 'url' => Auction::createUrl('company/auction')],
-                                ['label' => '<i class="fa  fa-github-square fa-fw"></i>Add Auction', 'url' => Auction::createUrl('company/create-auction')],
-                            ],
-                        ],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Users<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Company Users', 'url' => Auction::createUrl('company/user')],
-                                ['label' => '<i class="fa  fa-github-square fa-fw"></i>Dealers', 'url' => Auction::createUrl('company/dealer')],
-                            ],
-                        ],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Auction Lots<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Lots', 'url' => Auction::createUrl('company/lots')],
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Add Products In Lot', 'url' => Auction::createUrl('company/lot-product')],
-                            ],
-                        ],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Products<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>List Products', 'url' => Auction::createUrl('company/product')],
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Upload CSV', 'url' => Auction::createUrl('company/upload-csv')],
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Create Product Cofig', 'url' => Auction::createUrl('company/product-config')],
-                            ],
-                        ],
-                        [
-                            'template' => '<a class="active" href="#"><i class="fa fa-wrench fa-fw"></i>Setting<span class="fa arrow"></span></a>',
-                            'items' => [
-                                ['label' => '<i class="fa fa-play-circle-o fa-fw"></i>Update Info', 'url' => Auction::createUrl('company/edit')],
-                            ],
-                        ],
-                        ['label' => '<i class="fa fa-sign-out fa-fw"></i>Sign Out', 'url' => Auction::createUrl('site/logout')],
-                    ],
                     'encodeLabels' => false, //allows you to use html in labels,
                     'submenuTemplate' => "\n<ul class='nav nav-second-level'>\n{items}\n</ul>\n",
                 ]);  ?>

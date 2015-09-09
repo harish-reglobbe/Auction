@@ -11,6 +11,7 @@ use Yii;
 use auction\models\Companies;
 use auction\models\forms\SearchCompany;
 use yii\helpers\Json;
+use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -18,7 +19,7 @@ use yii\filters\VerbFilter;
 /**
  * CompaniesController implements the CRUD actions for Companies model.
  */
-class CompanyController extends DealerController
+class CompanyController extends Controller
 {
     public function behaviors()
     {
@@ -60,17 +61,13 @@ class CompanyController extends DealerController
                 $query->joinWith([
                     'dealerCompanyPreferences' => function ($query) {
                         $query->joinWith([
-                            'brand0' => function($query){
-                                $query->select('name');
-                            },
-                            'category0' => function($query){
-                                $query->select('name');
-                            }
-                        ])->asArray();
+                            'brand0',
+                            'category0'
+                        ]);
                     }
                 ])->where([
                     'dealer_company.company' => $id,
-                    'dealer_company.dealer' => 3
+                    'dealer_company.dealer' => Auction::dealer()
                 ]);
             }
         ])->where([
@@ -160,18 +157,22 @@ class CompanyController extends DealerController
         }
     }
 
-    public function actionEditPreferences(){
-        $id= Auction::$app->request->post('id',0);
-        if($id){
+    public function actionAddPreference(){
+        $post = Auction::$app->request->post();
 
-            $model = DealerCompanyPreferences::findAll('dc_id=:id',[':id' => $id]);
+        if($post){
+            $model = new DealerCompanyPreferences();
+            $model->brand = $post['brand'];
+            $model->category = $post['category'];
+            $model->dc_id = $post['dc_id'];
 
-            if(!$model){
-                $model = new DealerCompanyPreferences();
+            $companyId= $post['id'];
+
+            if($model->save()){
+                return $this->actionView($companyId);
+            }else {
+                throw new HttpException(400, 'Already Exist');
             }
-
-            return $this->renderPartial('_form',['model' => $model]);
-
         }
     }
 
@@ -182,5 +183,20 @@ class CompanyController extends DealerController
                 ->asArray()->all();
 
         return Json::encode($array);
+    }
+
+    public function actionDeletePreference(){
+        $post= Auction::$app->request->post('id');
+
+        $post = Json::decode($post,true);
+
+        DealerCompanyPreferences::find()->where([
+            'dc_id' => $post['dc_id'],
+            'category' => $post['category'],
+            'brand' => $post['brand']
+        ])->one()->delete();
+
+
+        return $this->actionIndex();
     }
 }

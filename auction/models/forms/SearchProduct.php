@@ -59,6 +59,7 @@ class SearchProduct extends Products
         //dump($this);
 
         $dataProvider->pagination->pageSize=$this->pageSize;
+        $dataProvider->key='product_id';
 
         $query->andFilterWhere([
             'cat_id' => ($this->category) ? intval($this->category) : '',

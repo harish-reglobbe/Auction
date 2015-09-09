@@ -9,6 +9,8 @@
 namespace auction\components;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\RequestException;
 
 class JAPI extends \common\components\JAPI{
 
@@ -24,6 +26,7 @@ class JAPI extends \common\components\JAPI{
                 //'referer'   => true,
                 //'protocols' => ['http', 'https']
             ],
+            'stream' => true
             //proxy'           => '192.168.16.1:10',
         ]);
         //NOT HANDLED
@@ -57,12 +60,18 @@ class JAPI extends \common\components\JAPI{
                 //TODO HANDLE ERRORS
                 return null;
             }
-        } catch (RequestException $e) {
-            //print_r($e->getRequest()->getUri());die();
+        } catch (BadResponseException $e) {
 
-            if ($e->hasResponse()) {
-                print_r($e->getResponse());
+            $responseBody = $e->getResponse()->getBody();
+
+            $responseContent='';
+            $i=0;
+            while(!$responseBody->eof()){
+                $i++;
+                $responseContent.=  $responseBody->read($i);
             }
+
+            return $responseContent;
         }
     }
 

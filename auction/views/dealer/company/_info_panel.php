@@ -6,12 +6,14 @@
  * Time: 11:09 AM
  */
 use yii\widgets\DetailView;
+use yii\helpers\Html;
+use yii\helpers\Url;
 ?>
 
 <div class="col-lg-4">
     <div class="<?php echo $model->is_active ? 'panel panel-success' : 'panel panel-danger'?>">
         <div class="panel-heading">
-            <?= $model->company0->name?>
+            <?= Html::a($model->company0->name, Url::to(['dealer/company/view' ,'id' => $model->primaryKey]))?>
         </div>
         <div class="panel-body">
             <div class="list-group">
@@ -27,10 +29,8 @@ use yii\widgets\DetailView;
             </div>
         </div>
         <div class="panel-footer">
-            <button class="btn btn-info edit-preferences" type="button" data-id="<?php echo $model->primaryKey ?>">Edit Preferences
-            </button>
             <?php if($model->is_active):?>
-                <button class="btn btn-danger deactivate-company" type="button" style="float: right" data-id="<?php echo $model->primaryKey ?>">De-Activate
+                <button class="btn btn-danger deactivate-company" type="button" data-id="<?php echo $model->primaryKey ?>">De-Activate
             </button>
             <?php endif;?>
         </div>

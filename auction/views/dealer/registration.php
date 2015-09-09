@@ -6,25 +6,20 @@ use auction\components\Auction;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Alert;
 
-$this->title = Auction::$app->name.' :: Dealer Registration';
+$this->title = Auction::$app->name . ' :: Dealer Registration';
 
 ?>
 <div class="row">
-    <?php if(Auction::$app->session->hasFlash('success')):?>
+    <?php if (Auction::$app->session->hasFlash('success')): ?>
 
-        <?php Alert::begin([
-            'options' => [
-                'class' => 'alert-success',
-            ],
-        ]);
-
+        <?php Alert::begin(['options' => ['class' => 'alert-success',]]);
         echo 'Dealer Registration Success';
+        Alert::end();
+        ?>
 
-        Alert::end();?>
-
-    <?php endif;?>
+    <?php endif; ?>
     <div class="col-md-6 "><!--Add col-md-offset-3 to make it in center-->
-        <div class="login-panel panel panel-info">
+        <div class="login-panel panel panel-info" style="margin-top: 20px;">
             <div class="panel-heading">
                 <h3 class="panel-title">Dealer Registration</h3>
             </div>
@@ -33,7 +28,7 @@ $this->title = Auction::$app->name.' :: Dealer Registration';
                     'id' => 'login-form',
                     'successCssClass' => false,
                     'fieldClass' => 'auction\widgets\ActiveField',
-                    'options'=> ['role' => 'form' ,'enctype' => 'multipart/form-data']]); ?>
+                    'options' => ['role' => 'form', 'enctype' => 'multipart/form-data']]); ?>
                 <fieldset>
 
                     <?= $form->field($model, 'name')->textInput() ?>
@@ -50,7 +45,7 @@ $this->title = Auction::$app->name.' :: Dealer Registration';
 
                     <?= $form->field($model, 'address')->textarea(['rows' => 6]) ?>
 
-                    <?= Html::submitButton('Register As Dealer',['class' => 'btn btn-lg btn-info btn-block'])?>
+                    <?= Html::submitButton('Register As Dealer', ['class' => 'btn btn-lg btn-info btn-block']) ?>
 
                 </fieldset>
                 <?php ActiveForm::end(); ?>

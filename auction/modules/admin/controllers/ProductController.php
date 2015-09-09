@@ -26,7 +26,7 @@ class ProductController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-               //     'delete' => ['post'],
+                    'delete' => ['post'],
                 ],
             ],
         ];
@@ -60,42 +60,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Products model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Products();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return "Success";
-        } else {
-            return $this->renderPartial('_form', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Updates an existing Products model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $_id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return 'Success';
-        } else {
-            return $this->renderAjax('_form', [
-                'model' => $model,
-            ]);
-        }
-    }
 
     /**
      * Deletes an existing Products model.
@@ -130,38 +95,4 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Upload Products To MongoDb
-     */
-    public function actionUpload(){
-        $model= new Products();
-
-        $columns= CSVColumns::ProductCSVColumn();
-
-        if(isset($_POST['Products'])){
-            $fileInstance=UploadedFile::getInstance($model, 'productCSV');
-            $csvData= new ReadCsv($fileInstance);
-
-            if($csvData->noOfColumns !== $columns->count)
-                throw new HttpException(400, 'Check Your CSV Upload File Columns');
-
-            $model->uploadCsvFile($csvData->data);
-
-        }
-
-        return $this->render('upload',[
-            'model' => $model,
-            'columns' => $columns
-        ]);
-    }
-
-    /**
-     * Download Sample Excel
-     */
-    public function actionSample(){
-        $csv = new ParseCSV();
-
-        $columns= CSVColumns::ProductCSVColumn(true);
-        $csv->output('Products.csv', [], $columns, ',');
-    }
 }

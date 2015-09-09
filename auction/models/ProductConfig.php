@@ -92,4 +92,8 @@ class ProductConfig extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Categories::className(), ['id' => 'cat_id']);
     }
+
+    public function getBrand(){
+        return $this->hasOne(Brands::className(), ['id' => 'brand_id']);
+    }
 }

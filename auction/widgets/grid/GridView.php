@@ -23,8 +23,6 @@ class GridView extends \yii\grid\GridView{
 
     public $isShowForm= true;
 
-    public $dataProviderKey = false;
-
     //filterSelector' => 'select[name="per-page"]',
 
     public $attribute='pageSize';
@@ -44,10 +42,6 @@ class GridView extends \yii\grid\GridView{
             $this->filterSelector = 'select[name="' . StringHelper::basename(get_class($this->filterModel)) . '[pageSize]"]';
         }
 
-        //Change DataProvider Default Keys
-        if($this->dataProviderKey !== false){
-            $this->dataProvider->key='product_id';
-        }
 
         parent::init();
 

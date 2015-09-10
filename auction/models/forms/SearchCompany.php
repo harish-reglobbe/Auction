@@ -76,12 +76,16 @@ class SearchCompany extends Companies
     }
 
     public function searchDealerCompany(){
-        $query = DealerCompany::find()->joinWith([
-            'company0',
+
+        /**
+         * DealerCompany::find()->joinWith([
+        'company0',
         ])->where([
-            'dealer_company.dealer' => Auction::$app->session->get('user.dealer'),
-         //   'dealer_company.is_active' => DatabaseHelper::ACTIVE
+        'dealer_company.dealer' => Auction::$app->session->get('user.dealer'),
+        //   'dealer_company.is_active' => DatabaseHelper::ACTIVE
         ]);
+         */
+        $query = Companies::find();
 
         return new ActiveDataProvider([
             'query' => $query,

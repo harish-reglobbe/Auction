@@ -111,7 +111,7 @@ class CompanyRegistration extends Model{
                 }
 
                 $transaction->commit();
-                $this->trigger(self::AFTER_SAVE);
+                //$this->trigger(self::AFTER_SAVE);
                 Auction::info('Company Registration Success');
                 return true;
 

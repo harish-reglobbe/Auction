@@ -1,31 +1,22 @@
 <?php
 
-namespace auction\controllers\company;
+namespace auction\controllers\dealer;
 
 use Yii;
 use auction\models\Auctions;
 use auction\models\forms\SearchAuction;
-use yii\web\Controller;
+use auction\components\controllers\DealerController;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use auction\models\forms\CreateAuction;
 
 /**
  * AuctionController implements the CRUD actions for Auctions model.
  */
-class AuctionController extends Controller
+class AuctionController extends DealerController
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
+    /**
+     * Defining Action Which need to be Included in AccessFilter
+     */
+    public $roleBaseActions = ['index' , 'view'];
 
     /**
      * Lists all Auctions models.
@@ -33,12 +24,10 @@ class AuctionController extends Controller
      */
     public function actionIndex()
     {
-
         $searchModel = new SearchAuction();
-        $dataProvider = $searchModel->companyAuction(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -62,10 +51,10 @@ class AuctionController extends Controller
      */
     public function actionCreate()
     {
-        $model = new CreateAuction();
+        $model = new Auctions();
 
-        if ($model->load(Yii::$app->request->post())) {
-            return $this->redirect(['view', 'id' => $model->save()]);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -114,10 +103,32 @@ class AuctionController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Auctions::findOne($id)) !== null) {
+        $model = Auctions::find()->joinWith([
+            'auctionsCriterias',
+            'bidsTerms',
+            'company0',
+        ])->where([
+            'auctions.id' => $id
+        ])->one();
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function actionListAuctions($term){
+
+        $array = Auctions::find()->select('id,name')
+            ->where(['like' , 'name' , $term])
+            ->asArray()->all();
+
+        return Json::encode($array);
+    }
+
+    public function actionApply($id){
+
+
     }
 }

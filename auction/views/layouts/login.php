@@ -35,7 +35,7 @@ AppAsset::register($this);
 
 <?php
 NavBar::begin([
-    'brandLabel' => '<img alt="" src="/Auction/auction/web/images/logo-reglobe.png">',
+    'brandLabel' => '<img alt="" src="/images/logo-reglobe.png">',
     'brandUrl' => '#',
     'renderInnerContainer' => false,
     'options' => [

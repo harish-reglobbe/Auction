@@ -84,6 +84,8 @@ class LoginForm extends Model
                 Auction::$app->session->set('user.dealer',$user->dealers->id);
             }
 
+            //Auction::infoLog('User Session is set with',[]);
+
             //Trigger User Login Event
             $user->trigger(Events::USER_LOGIN);
 

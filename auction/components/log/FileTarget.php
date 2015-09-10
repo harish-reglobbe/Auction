@@ -8,6 +8,7 @@
 
 namespace auction\components\log;
 
+use auction\components\AuctionRequest;
 use Yii;
 use auction\components\Auction;
 
@@ -35,16 +36,16 @@ class FileTarget extends \yii\log\FileTarget
         }
 
         $request = Yii::$app->getRequest();
-        $ip = $request instanceof Request ? $request->getUserIP() : '-';
+
+        $ip = $request instanceof AuctionRequest ? $request->userIp : '-';
 
         /* @var $user \yii\web\User */
-        $user = Yii::$app->has('user', true) ? Yii::$app->get('user') : null;
-        if ($user && ($identity = $user->getIdentity(false))) {
-            $userID = $identity->getId();
+        $user = Yii::$app->has('user') ? Yii::$app->get('user') : null;
+        if ($user) {
+            $userID = $user->identity->getId();
         } else {
             $userID = '-';
         }
-
         /* @var $session \yii\web\Session */
         $session = Yii::$app->has('session', true) ? Yii::$app->get('session') : null;
         $sessionID = $session && $session->getIsActive() ? $session->get('user.name') : '-';

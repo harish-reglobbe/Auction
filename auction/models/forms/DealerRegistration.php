@@ -96,7 +96,7 @@ class DealerRegistration extends Model{
                 }
 
                 $transaction->commit();
-                $this->trigger(self::AFTER_SAVE);
+//                $this->trigger(self::AFTER_SAVE);
                 Auction::info('Dealer Registration Success');
 
                 return true;

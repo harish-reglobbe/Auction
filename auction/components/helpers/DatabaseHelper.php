@@ -42,6 +42,9 @@ class DatabaseHelper
     const TOKEN_SEND_MODE_MOBILE = 0;
     const TOKEN_SEND_MODE_WEB = 1 ;
 
+    const DEALER_APPROVE_APPROVAL_REQUIRED=-1;
+    const DEALER_APPROVE_AUTO_APPROVAL=1;
+
     public static function UserRole($isShownAdmin=false){
 
         $roles=[

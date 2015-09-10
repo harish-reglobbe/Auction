@@ -63,6 +63,7 @@ class Menu extends \yii\widgets\Menu{
 
             $this->items = [
                 ['label' => '<i class="fa fa-dashboard fa-fw"></i>Dashboard', 'url' => Auction::createUrl('dealer/profile')],
+                ['label' => '<i class="fa fa-dashboard fa-fw"></i>Auctions', 'url' => Auction::createUrl('dealer/auction')],
                 ['label' => '<i class="fa fa-dashboard fa-fw"></i>Companies', 'url' => Auction::createUrl('dealer/company')],
                 ['label' => '<i class="fa fa-dashboard fa-fw"></i>Payment', 'url' => Auction::createUrl('dealer/payment')],
                 [

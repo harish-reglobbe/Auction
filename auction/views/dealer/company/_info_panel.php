@@ -13,12 +13,12 @@ use yii\helpers\Url;
 <div class="col-lg-4">
     <div class="<?php echo $model->is_active ? 'panel panel-success' : 'panel panel-danger'?>">
         <div class="panel-heading">
-            <?= Html::a($model->company0->name, Url::to(['dealer/company/view' ,'id' => $model->primaryKey]))?>
+            <?= Html::a($model->name, Url::to(['dealer/company/view' ,'id' => $model->primaryKey]))?>
         </div>
         <div class="panel-body">
             <div class="list-group">
                 <?= DetailView::widget([
-                    'model' => $model->company0,
+                    'model' => $model,
                     'template' => '<a href="#" class="list-group-item">{label}<span class="pull-right text-muted small"><em>{value}</em></span></a>',
                     'attributes' => [
                         'name',
@@ -29,10 +29,6 @@ use yii\helpers\Url;
             </div>
         </div>
         <div class="panel-footer">
-            <?php if($model->is_active):?>
-                <button class="btn btn-danger deactivate-company" type="button" data-id="<?php echo $model->primaryKey ?>">De-Activate
-            </button>
-            <?php endif;?>
         </div>
     </div>
     <!-- /.col-lg-4 -->

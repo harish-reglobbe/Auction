@@ -10,7 +10,9 @@ use auction\models\DealerCompanyPreferences;
 use Yii;
 use auction\models\Companies;
 use auction\models\forms\SearchCompany;
+use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -198,5 +200,15 @@ class CompanyController extends Controller
 
 
         return $this->actionIndex();
+    }
+
+    public function actionToggleStatus($id){
+
+        if(DealerCompany::model()->addedByDealer($id))
+            return $this->actionView($id);
+
+        else{
+            throw new HttpException(400 , 'Error in Action');
+        }
     }
 }

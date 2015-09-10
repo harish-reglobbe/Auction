@@ -19,19 +19,19 @@ class Admin extends \yii\base\Module
     }
 
 
-//    public function beforeAction($action){
-//
-//        $role=Auction::$app->session->get('user.role');
-//
-//        if(Auction::$app->user->isGuest){
-//            Auction::$app->user->loginRequired();
-//        }
-//
-//        if($role === DatabaseHelper::ADMIN)
-//            return true;
-//
-//        else
-//            throw new HttpException('403','ForBidden');
-//
-//    }
+    public function beforeAction($action){
+
+        $role=Auction::$app->session->get('user.role');
+
+        if(Auction::$app->user->isGuest){
+            Auction::$app->user->loginRequired();
+        }
+
+        if($role === DatabaseHelper::ADMIN)
+            return true;
+
+        else
+            throw new HttpException('403','ForBidden');
+
+    }
 }

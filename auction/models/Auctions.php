@@ -2,6 +2,7 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
 use yii\data\ActiveDataProvider;
 
@@ -26,7 +27,7 @@ use yii\data\ActiveDataProvider;
  * @property DealerSecurityConsume[] $dealerSecurityConsumes
  * @property Lots[] $lots
  */
-class Auctions extends \yii\db\ActiveRecord
+class Auctions extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -121,7 +122,13 @@ class Auctions extends \yii\db\ActiveRecord
      */
     public function getLots()
     {
-        return $this->hasMany(Lots::className(), ['auction' => 'id']);
+        $query =  Lots::find()->where([
+            'auction' => $this->id
+        ])->limit(3);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
     /**

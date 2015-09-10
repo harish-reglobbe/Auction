@@ -30,6 +30,7 @@ $this->title = 'Company :: Info';
     <!-- /.col-lg-12 -->
 </div>
 <!-- /.row -->
+<?php Pjax::begin(['id' => 'toggle-status',  'enablePushState' => false , 'clientOptions' => ['async' => false]])?>
 <div class="row">
     <div class="col-lg-8">
         <div class="chat-panel panel panel-green">
@@ -49,9 +50,9 @@ $this->title = 'Company :: Info';
                 ])?>
             </div>
             <div class="panel-footer" >
-                <?= Html::button(($model->dealerCompanies) ? ($model->dealerCompanies[0]->status) ? 'Unsubscribe' : 'Subscribe' : 'Subscribe',[
-                    'class' => ($model->dealerCompanies) ? ($model->dealerCompanies[0]->status) ? 'btn btn-danger' : 'btn btn-info' : 'btn btn-info'
-                ]) ?>
+                <?= Html::a(($model->dealerCompanies) ? ($model->dealerCompanies[0]->status) ? 'Unsubscribe' : 'Subscribe' : 'Subscribe',
+                    \yii\helpers\Url::to(['toggle-status', 'id' => $model->id])
+                    ) ?>
             </div>
             <!-- /.panel-body -->
         </div>
@@ -105,7 +106,7 @@ $this->title = 'Company :: Info';
     <!-- /.row -->
 </div>
 <!-- /.row -->
-<?php $companyModel= $model->dealerCompanies[0];if($companyModel): ?>
+<?php $companyModel= $model->dealerCompanies[0];if($companyModel && $companyModel->is_active): ?>
     <div class="row">
         <div class="col-md-6 "><!--Add col-md-offset-3 to make it in center-->
             <div class="login-panel panel panel-info" style="margin-top: 20px">
@@ -163,24 +164,8 @@ $this->title = 'Company :: Info';
         <!--    Col -md -6-->
     </div>
 <?php endif;?>
+<?php Pjax::end()?>
+
 <!-- /.row -->
-
-<?php
-$this->registerJs('
-jQuery(document).on("click" , ".delete-button" ,function(){
-    var id = $(this).attr("id");
-    $.ajax({
-    type: "post",
-    url : "'. \yii\helpers\Url::to(['delete-preference']) .'",
-    data: {id : id},
-    success : function(t){
-        $.pjax.reload({container:"#create-preferences",timeout:2e3});
-    }
-    });
-});
-jQuery(document).on("pjax:error", "#create-preferences",  function(event){alert ("Already Added");});
-');
-
-?>
 
 

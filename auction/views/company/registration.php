@@ -24,7 +24,7 @@ $this->title = Auction::$app->name.' :: Company Registration';
 
     <?php endif;?>
     <div class="col-md-6 "><!--Add col-md-offset-3 to make it in center-->
-        <div class="login-panel panel panel-info">
+        <div class="login-panel panel panel-info" style="margin-top: 20px">
             <div class="panel-heading">
                 <h3 class="panel-title">Company Registration</h3>
             </div>

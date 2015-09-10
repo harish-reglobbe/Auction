@@ -94,4 +94,5 @@ class SearchAuction extends Auctions
 
         return $dataProvider;
     }
+
 }

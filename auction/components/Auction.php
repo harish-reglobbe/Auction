@@ -41,7 +41,7 @@ class Auction extends Yii{
     }
 
     public static function loggerMessageFormat($message,$logVars){
-        $context[] = "{Params Details} = " . VarDumper::dumpAsString($logVars);
+        $context[] = "{Params} => " . VarDumper::dumpAsString($logVars);
         return $message.' :: '.implode("\n\n", $context);
     }
 
@@ -52,6 +52,12 @@ class Auction extends Yii{
     }
 
     public static function errorLog($message,$logVars){
+        $_message = self::loggerMessageFormat($message,$logVars);
+
+        self::error($_message);
+    }
+
+    public static function warningLog($message,$logVars){
         $_message = self::loggerMessageFormat($message,$logVars);
 
         self::error($_message);

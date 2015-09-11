@@ -77,13 +77,8 @@ class EditProfileController extends Controller
 
         $post = Json::decode($post,true);
 
-        DealerCompanyPreferences::find()->where([
-            'brand' => $post['brand'],
-            'category' => $post['category'],
-            'dealer' => $post['dealer']
-        ])->one()->delete();
-
-
-        return $this->actionIndex();
+        if(DealerPreference::model()->deletePreference($post)) {
+            return $this->actionIndex();
+        }
     }
 }

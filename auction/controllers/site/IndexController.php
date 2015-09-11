@@ -10,10 +10,6 @@ class IndexController extends \yii\web\Controller
     public function actionIndex()
     {
 
-//        dump(Auction::$app->session->count);
-        dump(count($_SESSION));
-        exit;
-
         if(Auction::$app->user->isGuest){
             Auction::warning('Guest User :: Redirecting to Login Page');
             $this->redirect(Auction::$app->urlManager->createAbsoluteUrl('site/login'));

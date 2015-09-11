@@ -87,4 +87,8 @@ class Auction extends Yii{
     public static function userRole(){
         return self::$app->session->get('user.role');
     }
+
+    public static function powered(){
+        return 'Powered by <a href="http://www.reglobe.in" rel="external">Reglobe</a>';
+    }
 }

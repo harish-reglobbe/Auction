@@ -2,7 +2,8 @@
 
 namespace auction\models;
 
-use Yii;
+use auction\models\core\ActiveRecord;
+use yii\base\InvalidParamException;
 
 /**
  * This is the model class for table "{{%dealer_preference}}".
@@ -15,7 +16,7 @@ use Yii;
  * @property Categories $category0
  * @property Brands $brand0
  */
-class DealerPreference extends \yii\db\ActiveRecord
+class DealerPreference extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -75,5 +76,24 @@ class DealerPreference extends \yii\db\ActiveRecord
 
     public static function primaryKey(){
         return ['dealer','brand','category'];
+    }
+
+    public function deletePreference($post){
+
+        try {
+            $model = self::find()->where([
+                'brand'    => $post['brand'],
+                'category' => $post['category'],
+                'dealer'    => $post['dealer']
+            ])->one();
+
+            if ($model) {
+                $model->delete();
+            }
+
+            return true;
+        }catch (InvalidParamException $e){
+            $e->getMessage();
+        }
     }
 }

@@ -6,6 +6,8 @@
  *
  * Provide Application Configuration For Yii Application
  */
+
+
 // <editor-fold desc="My Helder Dump Function">
 function dump($model,$die=true){
 yii\helpers\VarDumper::dump($model,10,true);
@@ -24,6 +26,9 @@ $components=array_merge(
 $config=[
     'modules' => require __DIR__.'/'.RG_ENV.'/_module.php',
     'components' => [
+        'response' => [
+            'class' => 'auction\components\Response',
+        ],
         'request' => [
             'class' => 'auction\components\AuctionRequest',
             'cookieValidationKey' => 'CxfcG_X1KQWeDTqXCZCDqt59j8HKqvao',
@@ -31,9 +36,6 @@ $config=[
         'user' => [
             'identityClass' => 'auction\models\Users',
             'enableAutoLogin' => true,
-        ],
-        'response' => [
-            'class' => 'yii\web\Response',
         ],
         'log' => [
             'traceLevel' => 0,
@@ -44,10 +46,21 @@ $config=[
                 ],
             ],
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
+        'session' => [
+            'savePath' => '@app/session',
         ],
-        'formatter' => [ 'class' => 'yii\i18n\Formatter', 'datetimeFormat' => 'Y-MM-dd hh:i:s', 'timeFormat' => 'H:i:s', 'nullDisplay' => '']
+        'errorHandler' => [
+            'errorAction' => 'site/error'
+        ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter', 'datetimeFormat' => 'Y-MM-dd hh:i:s', 'timeFormat' => 'H:i:s', 'nullDisplay' => ''
+        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true, // Cancel passing route in get 'r' paramater
+            'showScriptName' => false, // Remove index.php from url
+            'rules' => [
+            ]
+        ],
     ]
 ];
 $config['components']=array_merge($config['components'],$components);

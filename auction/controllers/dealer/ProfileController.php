@@ -2,37 +2,13 @@
 
 namespace auction\controllers\dealer;
 
-use auction\components\helpers\DatabaseHelper;
+use auction\components\controllers\DealerController;
 use auction\models\Dealers;
 use yii\web\HttpException;
 use auction\components\Auction;
-use auction\components\helpers\AccessRule;
-use yii\filters\AccessControl;
 
-class ProfileController extends \yii\web\Controller
+class ProfileController extends DealerController
 {
-    //Behaviour to Apply Access Filtering
-
-    public function behaviors(){
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'actions' => ['index'],
-                        'allow' => true,
-                        'roles' => [
-                            DatabaseHelper::DEALER
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
 
     public function actionIndex()
     {

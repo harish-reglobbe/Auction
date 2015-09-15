@@ -35,7 +35,10 @@ $this->title = Auction::$app->name . ' :: Dealer Registration';
 
                     <?= $form->field($model, 'password')->passwordInput() ?>
 
-                    <?= $form->field($model, 'mobile')->textInput() ?>
+                    <div class="form-group input-group">
+                        <span class="input-group-addon">+91</span>
+                        <?= $form->field($model, 'mobile')->textInput() ?>
+                    </div>
 
                     <?= $form->field($model, 'city')->textInput() ?>
 

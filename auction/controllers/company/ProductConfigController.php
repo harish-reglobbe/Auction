@@ -2,16 +2,15 @@
 
 namespace auction\controllers\company;
 
-use auction\models\forms\CreateProductConfig;
+use auction\components\controllers\Controller;
+use auction\components\helpers\DatabaseHelper;
 use auction\models\ProdConfName;
 use auction\models\ProdConfParam;
-use auction\modules\admin\components\CSVColumns;
 use auction\modules\admin\components\ParseCSV;
 use Yii;
 use auction\models\ProductConfig;
 use auction\models\forms\SearchProductConfig;
 use yii\helpers\ArrayHelper;
-use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -21,17 +20,8 @@ use yii\filters\VerbFilter;
  */
 class ProductConfigController extends Controller
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
+    public $roles = [DatabaseHelper::COMPANY_ADMIN, DatabaseHelper::COMPANY_USER];
+    public $roleBaseActions = ['index' , 'view' , 'create' ,'update', 'delete' ,'paramAdd' , 'deleteParam'];
 
     /**
      * Lists all ProductConfig models.
@@ -39,6 +29,7 @@ class ProductConfigController extends Controller
      */
     public function actionIndex()
     {
+
         $searchModel = new SearchProductConfig();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -67,7 +58,7 @@ class ProductConfigController extends Controller
      */
     public function actionCreate()
     {
-        $model = new CreateProductConfig();
+        $model = new ProductConfig();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return true;
@@ -138,6 +129,7 @@ class ProductConfigController extends Controller
             $model = new ProdConfParam();
             $post = Yii::$app->request->post();
 
+
             $model->p_conf_n_id = $post['ProdConfName']['id'];
             $model->name= $post['param-name'];
 
@@ -175,13 +167,9 @@ class ProductConfigController extends Controller
         }
 
         $category = [$model->proConf->cat->name];
-        $brand = [$model->proConf->brand->name];
+        $defaultColumns= ['Name','Image','Prize','Condition','Brand'];
 
-        $cat_brand = ArrayHelper::merge($category,$brand);
-
-        $defaultColumns= ['Name' , 'Image' , 'Price' , 'Condition' ,'Summary' ,'Quantity'];
-
-        $requiredColumns = ArrayHelper::merge($defaultColumns,$cat_brand);
+        $requiredColumns = ArrayHelper::merge($defaultColumns,$category);
         $requiredColumns = ArrayHelper::merge($requiredColumns,$param);
 
         $csv = new ParseCSV();

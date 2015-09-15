@@ -45,12 +45,12 @@ use yii\widgets\Pjax;
 
                 <?php foreach($model->prodConfParams as $param):?>
 
-                <div class="form-group input-group">
-                    <?= Html::activeTextInput($param, 'name',['class' => 'form-control' ,'disabled' => 'disabled']) ?>
-                    <span class="input-group-btn">
+                    <div class="form-group input-group">
+                        <?= Html::activeTextInput($param, 'name',['class' => 'form-control' ,'disabled' => 'disabled']) ?>
+                        <span class="input-group-btn">
                         <?= Html::button('<i class="fa fa-minus"></i>',['class' => 'btn btn-default delete-button' ,'id' => $param->primaryKey])?>
                 </span>
-                </div>
+                    </div>
 
                 <?php endforeach; ?>
 

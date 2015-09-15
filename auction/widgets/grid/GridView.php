@@ -8,6 +8,7 @@
 
 namespace auction\widgets\grid;
 
+use yii\bootstrap\Modal;
 use yii\helpers\StringHelper;
 use yii\widgets\Pjax;
 use yii\helpers\Url;
@@ -22,11 +23,14 @@ class GridView extends \yii\grid\GridView{
     public $options=['class' => 'table table-striped table-bordered table-hover', 'id' => 'dataTables-example'];
 
     public $isShowForm= true;
+    public $modalSize = Modal::SIZE_DEFAULT;
 
     //filterSelector' => 'select[name="per-page"]',
 
     public $attribute='pageSize';
     public $modelTitle='Modal Window';
+    public $createUrl;
+    public $updateUrl;
 
     public function init()
     {
@@ -70,8 +74,9 @@ class GridView extends \yii\grid\GridView{
         }
 
         echo ModelCrud::widget([
-            'updateUrl' => Url::to(['update']),
-            'createUrl' => Url::to(['create']),
+            'size' => $this->modalSize,
+            'updateUrl' => ($this->updateUrl)? $this->updateUrl : Url::to(['update']),
+            'createUrl' => ($this->createUrl)? $this->createUrl : Url::to(['create']),
             'updateVerb' => 'post',
             'viewUrl' => Url::to(['view']),
             'viewVerb' => 'post',

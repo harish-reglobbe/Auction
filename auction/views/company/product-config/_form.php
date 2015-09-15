@@ -19,7 +19,6 @@ use auction\components\Auction;
         //'action' => Url::to(['brand/create']),
         'options' => [
             'data-pjax' => 1,
-            'enctype' => 'multipart/form-data'
         ],
         'enableClientValidation' => false
 
@@ -28,14 +27,14 @@ use auction\components\Auction;
 
     <?= $form->field($model, 'name')->textInput() ?>
 
-    <?= $form->field($model, 'typeName')->textInput() ?>
+    <?= $form->field($model, 'cat_id')->dropDownList(Auction::dropDownList('auction\models\Categories', 'id', 'name')) ?>
 
-    <?= $form->field($model, 'cat_id')->dropDownList(Auction::dropDownList('auction\models\Categories' , 'id' ,'name')) ?>
+    <?= $form->field($model, 'brand_id')->dropDownList(Auction::dropDownList('auction\models\Brands', 'id', 'name')) ?>
 
-    <?= $form->field($model, 'brand_id')->dropDownList(Auction::dropDownList('auction\models\Brands' , 'id' ,'name')) ?>
+    <?= $form->field($model, 'company')->hiddenInput(['value' => Auction::company()])->label(false) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->name == '' ? 'Create' : 'Update', ['class' => $model->name == '' ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => ($model->isNewRecord) ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

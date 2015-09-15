@@ -189,6 +189,8 @@ class Products extends \yii\mongodb\ActiveRecord
 
         }
 
+        dump($products);
+
         if(count($products) > 0){
             $this->_request=Json::encode($products);
 
@@ -267,13 +269,13 @@ class Products extends \yii\mongodb\ActiveRecord
 
         $extraCondition = array_slice($data, 8 , count($data));
 
-        $extraCond= '';
+        $extraCond= [];
 
         foreach($extraCondition as $key=>$value){;
-            $extraCond.=$key.':'.$value.'||';
+            $extraCond[]=[$key => $value];
         }
 
-        $this->extra_cond = substr($extraCond, 0, -2);
+        $this->extra_cond = $extraCond;
 
         return parent::validate();
     }

@@ -26,7 +26,7 @@ class ActionColumn extends \yii\grid\ActionColumn
                 return $this->viewButton($url,$model);
             },
             'delete' => function($url,$model) use ($visibleColumn){
-                return $model->$visibleColumn ? $this->deleteButton($url,$model) : '';
+                return ($model->hasAttribute($visibleColumn) && $model->$visibleColumn) ? $this->deleteButton($url,$model) : '';
             }
         ];
         parent::init();

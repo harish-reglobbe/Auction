@@ -1,20 +1,16 @@
 <?php
 
 namespace auction\modules\admin\controllers;
-
 use auction\components\Auction;
-use auction\components\helpers\DatabaseHelper;
-use Yii;
 use auction\models\Brands;
 use auction\models\forms\SearchBrand;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 
 /**
  * BrandController implements the CRUD actions for Brands model.
  */
-class BrandController extends Controller
+class BrandController extends \yii\web\Controller
 {
     public function behaviors()
     {
@@ -22,9 +18,8 @@ class BrandController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post'],
-                    'create' => ['post'],
                     'view' => ['post'],
+                    'create' => ['post'],
                     'update' => ['post']
                 ],
             ],
@@ -38,7 +33,7 @@ class BrandController extends Controller
     public function actionIndex()
     {
         $searchModel = new SearchBrand();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Auction::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -54,7 +49,6 @@ class BrandController extends Controller
     public function actionView()
     {
         $id=Auction::$app->request->post('id');
-
         if($id) {
             return $this->renderPartial('view', [
                 'model' => $this->findModel($id),
@@ -70,8 +64,7 @@ class BrandController extends Controller
     public function actionCreate()
     {
         $model = new Brands();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Auction::$app->request->post()) && $model->save()) {
             return 'Success';
         } else {
             return $this->renderPartial('_form', [
@@ -89,41 +82,17 @@ class BrandController extends Controller
     public function actionUpdate()
     {
         $id=Auction::$app->request->post('id');
-
         if($id){
             $model = $this->findModel($id);
 
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($model->load(Auction::$app->request->post()) && $model->save()) {
                 return 'Successfully Updated';
             } else {
                 return $this->renderPartial('update', [
                     'model' => $model,
                 ]);
             }
-
         }
-
-    }
-
-    /**
-     * Deletes an existing Brands model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete()
-    {
-
-        $id=Auction::$app->request->post('id');
-
-        if($id){
-
-            $model=$this->findModel($id);
-            $model->is_active=DatabaseHelper::IN_ACTIVE;
-            $model->save();
-
-        }
-
     }
 
     /**

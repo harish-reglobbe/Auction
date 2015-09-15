@@ -1,40 +1,49 @@
 <?php
+use auction\components\helpers\BootstrapHelper;
+use auction\widgets\DetailView;
 
-use yii\helpers\Html;
-use yii\widgets\DetailView;
-
-/* @var $this yii\web\View */
-/* @var $model auction\models\Dealers */
-
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Dealers', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="dealers-view">
+<div class="row">
+    <div class="col-lg-8">
+        <div class="panel panel-green">
+            <div class="panel-heading">
+                Dealer Info
+                <div class="btn-group pull-right">
+                    <a href="">De-Activate</a>
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Dealer Details
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <?= DetailView::widget([
+                                'model' => $model,
+                                'attributes' => [
+                                    'user0.name',
+                                    'contact',
+                                    'user0.email',
+                                ]
+                            ]) ?>
+                        </div>
+                        <!-- /.list-group -->
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
 
-    <h1><?= Html::encode($this->title) ?></h1>
+                <!-- /.Dealer Description Panel Start -->
+                <?php BootstrapHelper::PanelInfo('Delaer Address', $model->address); ?>
+                <!-- /.Dealer Description Panel End -->
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'city',
-            'contact',
-            'address:ntext',
-            'user',
-        ],
-    ]) ?>
-
-</div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel .chat-panel -->
+        </div>
+        <!-- /.col-lg-4 -->
+    </div>
+    <!-- /.row -->

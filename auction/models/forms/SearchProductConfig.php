@@ -2,7 +2,9 @@
 
 namespace auction\models\forms;
 
+use auction\components\Auction;
 use auction\models\ProdConfName;
+use auction\models\ProductConfig;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -10,7 +12,7 @@ use yii\data\ActiveDataProvider;
 /**
  * SearchProductConfig represents the model behind the search form about `auction\models\ProductConfig`.
  */
-class SearchProductConfig extends ProdConfName
+class SearchProductConfig extends ProductConfig
 {
     public $pageSize =10;    /**
      * @inheritdoc
@@ -39,7 +41,7 @@ class SearchProductConfig extends ProdConfName
      */
     public function search($params)
     {
-        $query = ProdConfName::find();
+        $query = ProductConfig::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -54,10 +56,8 @@ class SearchProductConfig extends ProdConfName
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
+            'company' => Auction::company(),
         ]);
-
-        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

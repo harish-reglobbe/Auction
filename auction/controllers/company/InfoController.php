@@ -4,6 +4,8 @@ namespace auction\controllers\company;
 
 use auction\components\Auction;
 use auction\components\helpers\AccessRule;
+use auction\models\Auctions;
+use auction\models\Brands;
 use yii\filters\AccessControl;
 use yii\web\HttpException;
 use auction\models\Companies;
@@ -33,6 +35,12 @@ class InfoController extends \yii\web\Controller
 
     public function actionIndex()
     {
+        $model = new Brands();
+        $model->name = 'Name';
+        $model->description = 'Des';
+        dump($model);
+
+
         $model=$this->loadModel();
 
         return $this->render('info',[

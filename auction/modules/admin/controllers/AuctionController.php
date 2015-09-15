@@ -14,7 +14,7 @@ use yii\filters\VerbFilter;
 /**
  * AuctionController implements the CRUD actions for Auctions model.
  */
-class AuctionController extends CategoryController
+class AuctionController extends Controller
 {
     public function behaviors()
     {
@@ -22,8 +22,8 @@ class AuctionController extends CategoryController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post'],
-                    'view' => ['post']
+                    'update' => ['post'],
+                    'view' => ['post'],
                 ],
             ],
         ];
@@ -54,33 +54,31 @@ class AuctionController extends CategoryController
         $id=Auction::$app->request->post('id',0);
 
         if($id){
-
             return $this->renderPartial('view', [
                 'model' => $this->findModel($id),
             ]);
-
         }
-
     }
 
-
     /**
-     * Deletes an existing Auctions model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * Updates an existing Brands model.
+     * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete()
+    public function actionUpdate()
     {
-        $id=Auction::$app->request->post('id',0);
-
+        $id=Auction::$app->request->post('id');
         if($id){
-            $model = $this->findModel($id);
-            $model->status= DatabaseHelper::IN_ACTIVE;
-
-            return $model->save();
+            $model = Auctions::findOne($id);
+            if ($model->load(Auction::$app->request->post()) && $model->save()) {
+                return 'Successfully Updated';
+            } else {
+                return $this->renderPartial('update', [
+                    'model' => $model,
+                ]);
+            }
         }
-
     }
 
     /**
@@ -92,16 +90,14 @@ class AuctionController extends CategoryController
      */
     protected function findModel($id)
     {
-        $query=Auctions::find()->joinWith([
+        $model = Auctions::find()->joinWith([
             'bidsTerms',
             'auctionsCriterias'
         ])->where([
            'auctions.id' => $id
-        ]);
+        ])->one();
 
-        $model=$query->one();
-
-        if (($model = Auctions::findOne($id)) !== null) {
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

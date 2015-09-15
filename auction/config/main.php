@@ -12,7 +12,7 @@ return [
     'name' => 'Auction',
     'controllerNamespace' => 'auction\controllers',
     'defaultRoute' => 'site/index',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log' , 'debug'],
     'modules' => [],
     'components' => [
         'errorHandler' => [

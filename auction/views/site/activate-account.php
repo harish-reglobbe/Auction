@@ -1,9 +1,16 @@
 <?php
 /* @var $this yii\web\View */
-?>
-<h1>activate-account/activate-account</h1>
+use auction\components\Auction;
+use yii\bootstrap\Alert;
 
-<p>
-    You may change the content of this page by modifying
-    the file <code><?= __FILE__; ?></code>.
-</p>
+?>
+<h1>Activation Status</h1>
+
+<?php if (Auction::$app->session->hasFlash('activate-status')): ?>
+
+    <?php Alert::begin(['options' => ['class' => 'alert-success',]]);
+    echo Auction::$app->session->getFlash('activate-status');
+    Alert::end();
+    ?>
+
+<?php endif; ?>

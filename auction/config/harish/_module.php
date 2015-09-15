@@ -20,10 +20,7 @@ return [
             'class' => 'auction\modules\admin\Admin',
             'defaultRoute' => 'user'
         ],
-        'paytm' => [
-            'class' => 'frontend\modules\paytm\Module',
-        ],
-        'api' => [
-            'class' => 'auction\modules\api\Api',
-        ],
+        'debug' => [
+            'class' => 'yii\debug\Module',
+        ]
 ];

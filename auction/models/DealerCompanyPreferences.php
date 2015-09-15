@@ -2,7 +2,9 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%dealer_company_preferences}}".
@@ -15,8 +17,12 @@ use Yii;
  * @property Brands $brand0
  * @property Categories $category0
  */
-class DealerCompanyPreferences extends \yii\db\ActiveRecord
+class DealerCompanyPreferences extends ActiveRecord
 {
+    // Disabeling Behaviours
+    public function behaviors(){
+        return [];
+    }
     /**
      * @inheritdoc
      */
@@ -73,8 +79,19 @@ class DealerCompanyPreferences extends \yii\db\ActiveRecord
         return $this->hasOne(Categories::className(), ['id' => 'category']);
     }
 
-
     public static function primaryKey(){
-        return ['dc_id' , 'brand' , 'category'];
+        return ['dc_id','brand','category'];
+    }
+
+    public function addPreference($post){
+        $this->brand = ArrayHelper::getValue($post , 'brand');
+        $this->category = ArrayHelper::getValue($post , 'category');
+        $this->dc_id = ArrayHelper::getValue($post , 'dc_id');
+
+        if($this->save()){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

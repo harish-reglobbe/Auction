@@ -18,10 +18,8 @@ class RegistrationController extends Controller
 
         $model = new CompanyRegistration();
 
-        if ($model->load(Auction::$app->request->post())) {
-            if ($user = $model->SaveCompany()) {
+        if ($model->load(Auction::$app->request->post()) && $model->save()) {
                 Auction::$app->session->setFlash('success', 'Thank you ');
-            }
 
             return $this->refresh();
         }

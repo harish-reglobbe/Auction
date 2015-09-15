@@ -2,8 +2,10 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
 use auction\models\core\ActiveRecord;
-use yii\base\InvalidParamException;
+use yii\base\InvalidValueException;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%dealer_preference}}".
@@ -21,6 +23,10 @@ class DealerPreference extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function behaviors(){
+        return [];
+    }
+
     public static function tableName()
     {
         return '{{%dealer_preference}}';
@@ -79,21 +85,29 @@ class DealerPreference extends ActiveRecord
     }
 
     public function deletePreference($post){
+        $model = self::find()->where([
+            'brand'    => ArrayHelper::getValue($post , 'brand'),
+            'category' => ArrayHelper::getValue($post , 'category'),
+            'dealer'    => ArrayHelper::getValue($post , 'dealer'),
+        ])->one();
 
-        try {
-            $model = self::find()->where([
-                'brand'    => $post['brand'],
-                'category' => $post['category'],
-                'dealer'    => $post['dealer']
-            ])->one();
-
-            if ($model) {
-                $model->delete();
-            }
-
+        if ($model) {
+            $model->delete();
             return true;
-        }catch (InvalidParamException $e){
-            $e->getMessage();
+        }else{
+            return false;
+        }
+    }
+
+    public function addPreference($post){
+        $this->brand = ArrayHelper::getValue($post , 'brand');
+        $this->category = ArrayHelper::getValue($post ,'category');
+        $this->dealer = Auction::dealer();
+
+        if($this->save()){
+            return true;
+        }else {
+            throw new InvalidValueException('Already Exist');
         }
     }
 }

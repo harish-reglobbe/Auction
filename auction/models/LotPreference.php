@@ -2,6 +2,7 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
 
 /**
@@ -15,8 +16,13 @@ use Yii;
  * @property Brands $brand0
  * @property Categories $category0
  */
-class LotPreference extends \yii\db\ActiveRecord
+class LotPreference extends ActiveRecord
 {
+    public function behaviors()
+    {
+        return [];
+    }
+
     /**
      * @inheritdoc
      */
@@ -70,5 +76,9 @@ class LotPreference extends \yii\db\ActiveRecord
     public function getCategory0()
     {
         return $this->hasOne(Categories::className(), ['id' => 'category']);
+    }
+
+    public static function primaryKey(){
+        return ['lots' , 'brand' , 'category'];
     }
 }

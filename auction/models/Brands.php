@@ -3,9 +3,11 @@
 namespace auction\models;
 
 use auction\components\Auction;
+use auction\models\core\ActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 use auction\components\Events;
@@ -28,29 +30,21 @@ use auction\components\EventHandler;
  * @property LotPreference[] $lotPreferences
  * @property Products[] $products
  */
-class Brands extends \yii\db\ActiveRecord
+class Brands extends ActiveRecord
 {
     /**
      * @inheritdoc
      */
+
+    public function behaviors(){
+
+    }
 
     private $_uploadDirectory;
 
     public static function tableName()
     {
         return '{{%brands}}';
-    }
-
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'create_date',
-                'updatedAtAttribute' => 'update_date',
-                'value' => new Expression('NOW()'),
-            ],
-        ];
     }
 
     /**
@@ -62,6 +56,7 @@ class Brands extends \yii\db\ActiveRecord
             [['name',], 'required'],
             [['description'], 'string'],
             [['is_active'], 'integer'],
+            ['name', 'unique']
         ];
     }
 
@@ -82,7 +77,7 @@ class Brands extends \yii\db\ActiveRecord
     }
 
     public function init(){
-        $this->on(Events::SAVE_UPLOAD_THUMB, [EventHandler::className(), 'UploadImageThumb']);
+        $this->on(Events::UPLOAD_IMAGE, [EventHandler::className(), 'UploadImage']);
     }
 
     /**
@@ -139,27 +134,14 @@ class Brands extends \yii\db\ActiveRecord
                 $this->addError('image','Please Upload a valid Image');
                 return false;
             }
-
-            $uploadDirectory= $this->UploadDirectory();
-
-            if(!is_dir($uploadDirectory)){
-                FileHelper::createDirectory($uploadDirectory);
-            }
-
-            $imageName=$this->image->baseName.time().'.'.$this->image->extension;
-
-            $this->image->saveAs($uploadDirectory.$imageName);
-            $this->image=$imageName;
-            $this->trigger(Events::SAVE_UPLOAD_THUMB);
-
+            $this->trigger(Events::UPLOAD_IMAGE);
         }
         else {
-            $this->image = $this->oldAttributes['image'];
+            if(!$this->isNewRecord){
+                $this->image = ArrayHelper::getValue($this->oldAttributes , 'image');
+            }
         }
-
-
         return parent::save(false);
-
     }
 
 
@@ -171,7 +153,6 @@ class Brands extends \yii\db\ActiveRecord
         }
 
         return $this->_uploadDirectory;
-
     }
 
 }

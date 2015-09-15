@@ -5,10 +5,9 @@ namespace auction\models;
 use auction\components\Auction;
 use auction\components\EventHandler;
 use auction\components\Events;
-use auction\components\helpers\DatabaseHelper;
-use Yii;
-use yii\db\Expression;
-use yii\behaviors\TimestampBehavior;
+use auction\models\core\ActiveRecord;
+use yii\base\Event;
+use yii\web\HttpException;
 
 /**
  * This is the model class for table "{{%forgot_password_history}}".
@@ -24,21 +23,8 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property Users $user0
  */
-class ForgotPasswordHistory extends \yii\db\ActiveRecord
+class ForgotPasswordHistory extends ActiveRecord
 {
-    public $userObject;
-
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'create_date',
-                'updatedAtAttribute' => 'update_date',
-                'value' => new Expression('NOW()'),
-            ],
-        ];
-    }
     /**
      * @inheritdoc
      */
@@ -49,7 +35,6 @@ class ForgotPasswordHistory extends \yii\db\ActiveRecord
 
     public function init(){
         $this->on(Events::TOKEN_INVALID, [EventHandler::className(), 'TokenInvalid']);
-        $this->on(Events::SEND_RESET_TOKEN, [EventHandler::className(), 'SendResetToken']);
     }
 
     /**
@@ -94,27 +79,19 @@ class ForgotPasswordHistory extends \yii\db\ActiveRecord
     /**
      * Generates new password reset token
      * @param user User Object
-     * @return bool status of save model
+     *
+     * @throws  Http Exception
      */
-    public function generatePasswordResetToken()
+    public function generateOtp($user)
     {
+        $this->user =  $user->id;
         $this->trigger(Events::TOKEN_INVALID);
 
-        $this->user = $this->userObject->id;
-        $this->token = Auction::$app->security->generateRandomString(6);
-        $this->valid_till = Auction::$app->formatter->asDatetime(DatabaseHelper::EMAIL_TOKEN_VALID_TIME);
-        $this->status = DatabaseHelper::ACTIVE;
-        $this->mode= DatabaseHelper::TOKEN_SEND_MODE_WEB;
-
-        if($this->save()){
-            Auction::infoLog('Token is created with following options ', $this->getAttributes());
-
-            $this->trigger(Events::SEND_RESET_TOKEN);
-            return true;
-        }
-        else{
-            Auction::errorLog('Token has following validation error  ', $this->getErrors());
-            return false;
+        $token = Auction::$app->security->generateRandomString(6);
+        try{
+            Auction::$app->db->createCommand("call create_email_otp ($user->id,'$token','$user->email')")->execute();
+        }catch (Exception $Ex){
+            throw new HttpException(400);
         }
     }
 

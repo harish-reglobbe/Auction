@@ -13,6 +13,7 @@
 
 namespace auction\components;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\VarDumper;
 use Yii;
 
@@ -72,7 +73,7 @@ class Auction extends Yii{
     }
 
     public static function username(){
-        return self::$app->session->get('user.name');
+        return self::$app->session->get('user.name' ,'');
     }
 
     public static function dealer(){
@@ -90,5 +91,24 @@ class Auction extends Yii{
 
     public static function powered(){
         return 'Powered by <a href="http://www.reglobe.in" rel="external">Reglobe</a>';
+    }
+
+    //Show Image Function
+    public static function showImage($category ,$image, $thumb = true,$htmlOptions=[]){
+        $relativePath = self::$app->request->baseUrl;
+        $file = '/uploads/'.$category.'/thumbs/'.$image;
+
+        if(file_exists(self::getAlias('@webroot').$file)){
+            $relativePath.=$file;
+        }else {
+            $relativePath.='/images/default.png';
+        }
+
+        return Html::img($relativePath,$htmlOptions);
+
+    }
+
+    public static function post($name = null, $defaultValue = null){
+        return self::$app->request->post($name , $defaultValue);
     }
 }

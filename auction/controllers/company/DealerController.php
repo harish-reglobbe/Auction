@@ -8,26 +8,22 @@ use auction\models\DealerCompany;
 use Yii;
 use auction\models\Dealers;
 use auction\models\forms\SearchCompany;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * DealerController implements the CRUD actions for Dealers model.
  */
-class DealerController extends Controller
+class DealerController extends \auction\components\controllers\Controller
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
+    public $roles = [DatabaseHelper::COMPANY_ADMIN , DatabaseHelper::COMPANY_USER];
+    public $roleBaseActions = ['index' , 'view' ,'activate' , 'deactivate'];
+
+    public $verbs = [
+        'view' => ['get'],
+        'index' => ['get'],
+        'deactivate' => ['post'],
+        'activate' => ['post']
+    ];
 
     /**
      * Lists all Dealers models.
@@ -51,46 +47,18 @@ class DealerController extends Controller
      */
     public function actionView($id)
     {
+        $_model = Dealers::find()
+                    ->with(['user0'])
+                    ->where('id=:id',[':id' => $id])
+                    ->one();
+
+        if($_model === null){
+            Auction::infoLog('No Dealer Found' , ['id' => $id]);
+            throw new NotFoundHttpException('No Dealer Found');
+        }
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $_model
         ]);
-    }
-
-    /**
-     * Creates a new Dealers model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Dealers();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Updates an existing Dealers model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
     }
 
     /**
@@ -99,7 +67,7 @@ class DealerController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete()
+    public function actionDeactivate()
     {
         $id= Auction::$app->request->post('id',0);
 
@@ -120,6 +88,8 @@ class DealerController extends Controller
         if($id){
             $model = $this->findModel($id);
             $model->is_active = DatabaseHelper::ACTIVE;
+            $model->touch('aprv_date');
+          //  $model->aprv_by = Auction::username();
 
             if(!$model->save()){
                 return false;

@@ -2,9 +2,8 @@
 
 namespace auction\models;
 
-use Yii;
-use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
+use auction\models\core\ActiveRecord;
+use auction\models\core\TimestampBehaviour;
 
 /**
  * This is the model class for table "product_config".
@@ -20,16 +19,13 @@ use yii\db\Expression;
  * @property Companies $company0
  * @property Categories $cat
  */
-class ProductConfig extends \yii\db\ActiveRecord
+class ProductConfig extends ActiveRecord
 {
 
     public function behaviors()
     {
         return [
-            [
-                'class' => TimestampBehavior::className(),
-                'value' => new Expression('NOW()'),
-            ],
+            TimestampBehaviour::className(),
         ];
     }
 
@@ -47,7 +43,7 @@ class ProductConfig extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'company',], 'required'],
+            [['name', 'company','brand_id', 'cat_id'], 'required'],
             [['company', 'cat_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255]

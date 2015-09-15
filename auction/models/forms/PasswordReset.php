@@ -3,6 +3,8 @@
 namespace auction\models\forms;
 
 use auction\components\Auction;
+use auction\models\ForgotPasswordHistory;
+use auction\models\OptHistory;
 use yii\base\Model;
 
 /**
@@ -45,10 +47,14 @@ class PasswordReset extends Model
         $user = $this->validators[2]->user;
         Auction::info('User is ready to sent a new Token');
 
-        if ($user) {
-            return $user->Token($this->via)->generatePasswordResetToken();
-        }
+        switch ($this->via){
+            case 'email' :
+                ForgotPasswordHistory::model()->generateOtp($user);
+                break;
 
+            case 'sms':
+                OptHistory::model()->generateOtp($user);
+        }
         return false;
     }
 }

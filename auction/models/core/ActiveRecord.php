@@ -45,13 +45,19 @@ class ActiveRecord extends \yii\db\ActiveRecord{
         ];
     }
 
-    public function afterSave($insert, $changedAttributes){
+    public function beforeSave($insert){
 
-        if($this->isNewRecord){
-            Auction::infoLog('Model record :: '. self::className() .' Has Successfully Saved',$this->getAttributes());
+        if(parent::beforeSave($insert)){
+
+            if($this->isNewRecord){
+                Auction::infoLog('Model record :: '. self::className() .' Has Successfully Saved',$this->getAttributes());
+            }else{
+                Auction::infoLog('Model record :: '. self::className() .' Has Successfully updated ',$this->getAttributes());
+            }
+
             return true;
+
         }else{
-            Auction::infoLog('Model record :: '. self::className() .' Has Successfully updated ',$this->getAttributes());
             return false;
         }
 

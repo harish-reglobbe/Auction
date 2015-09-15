@@ -22,6 +22,7 @@ $this->title='Products';
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
+                <button class="btn btn-info" type="button" id="create-modal">+ Add More Products</button>
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
@@ -48,6 +49,18 @@ $this->title='Products';
                 ]); ?>
 
             </div>
+            <?= Html::button('Delete Selected',['class' => 'btn btn-info', 'onclick' => new JsExpression('
+                var id = $("#dataTables-example").yiiGridView("getSelectedRows");
+                alert(id);
+                $.ajax({
+                type : "post",
+                url  :  "'. Url::to(['delete']) .'",
+                data : {id : id},
+                success : function(data){
+                        $.pjax.reload({container:"#pjax-gridview",timeout:2e3});
+                }
+                });
+            ')]);?>
             <!-- /.panel-body -->
         </div>
         <!-- /.panel -->
@@ -55,4 +68,11 @@ $this->title='Products';
     <!-- /.col-lg-12 -->
 </div>
 <!-- /.row -->
+<?php
+$this->registerJs('
+jQuery(document).on("pjax:success", "#brand-form",  function(event){$.pjax.reload({container:"#pjax-gridview",timeout:2e3}),$("#activity-modal").modal("hide")});
+jQuery(document).pjax("#brand-form a", "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});
+jQuery(document).on("submit", "#brand-form form[data-pjax]", function (event) {jQuery.pjax.submit(event, "#brand-form", {"push":false,"replace":false,"timeout":false,"scrollTo":false});});
+    ');
+?>
 

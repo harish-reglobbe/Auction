@@ -27,6 +27,8 @@ class ModelCrud extends Widget
     public $createVerb='get';
     public $updateVerb='get';
 
+    public $size;
+
     public $updateModalSelector='.update-modal';
 //    public $deleteModelSelector='.delete-modal';
     public $viewModalSelector='.view-modal';
@@ -70,6 +72,7 @@ class ModelCrud extends Widget
 
         Modal::begin([
             'id' => 'activity-modal',
+            'size' => $this->size,
             'header' => '<h2>'. $this->modelTitle .'</h2>',
             'footer' => Html::button('Close', ['class' => 'btn btn-info', 'data-dismiss' => 'modal']),
         ]);

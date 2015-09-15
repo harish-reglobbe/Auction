@@ -2,6 +2,7 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
 
 /**
@@ -16,8 +17,11 @@ use Yii;
  *
  * @property Auctions $auction0
  */
-class BidsTerm extends \yii\db\ActiveRecord
+class BidsTerm extends ActiveRecord
 {
+    public function behaviors(){
+        return [];
+    }
     /**
      * @inheritdoc
      */

@@ -8,10 +8,9 @@
 
 namespace auction\models\forms;
 
-
 use auction\components\Auction;
-use auction\models\AuctionPreference;
 use auction\models\Auctions;
+use auction\models\AuctionPreference;
 use auction\models\AuctionsCriteria;
 use auction\models\BidsTerm;
 use yii\base\Exception;
@@ -23,7 +22,6 @@ class CreateAuction extends Model{
     public $duration;
     public $amount;
     public $start_date;
-    public $company;
     public $status;
     public $priority;
     public $security;
@@ -35,10 +33,11 @@ class CreateAuction extends Model{
     public $category;
     public $brand;
 
-
     public function rules(){
         return [
-            [['name','amount','duration','start_date','company','status','priority','security','is_percent','max_bid','cooling_prd','last_min_extd','max_extd','category','brand'],'required']
+            [['name','amount','start_date','security','is_percent','priority','cooling_prd','last_min_extd','max_extd', 'status' ,'category','brand'],'required'],
+            [['duration','priority', 'max_bid', 'cooling_prd', 'last_min_extd', 'max_extd', 'auction','is_percent'], 'integer'],
+            [['amount'], 'number'],
         ];
     }
 
@@ -61,18 +60,11 @@ class CreateAuction extends Model{
         ];
     }
 
-    public function init(){
-        $this->company = Auction::$app->session->get('user.company',0);
-    }
-
     public function save(){
-        dump($this);
 
         $transaction=Auction::$app->db->beginTransaction();
         try{
-
             $auction=$this->loadAuction();
-
             if($auction === null){
                 return null;
             }
@@ -92,7 +84,6 @@ class CreateAuction extends Model{
             $transaction->rollBack();
             return null;
         }
-
     }
 
     /**
@@ -100,7 +91,7 @@ class CreateAuction extends Model{
      */
     private function loadAuction(){
         $model= new Auctions();
-
+        $model->company = Auction::company();
         return $this->saveModel($model);
     }
 
@@ -110,7 +101,6 @@ class CreateAuction extends Model{
      */
     private function loadAuctionCriteria($auction){
         $model= new AuctionsCriteria();
-
         $model->auction=$auction;
         return $this->saveModel($model);
     }
@@ -121,7 +111,6 @@ class CreateAuction extends Model{
      */
     private function loadAuctionBids($auction){
         $model= new BidsTerm();
-
         $model->auction=$auction;
         return $this->saveModel($model);
     }
@@ -141,6 +130,7 @@ class CreateAuction extends Model{
         $model->setAttributes($this->getAttributes(),false);
 
         if($model->save(false)){
+            Auction::infoLog('Saving '. $model->className(), $model->getAttributes());
             return $model->primaryKey;
         }
         else {

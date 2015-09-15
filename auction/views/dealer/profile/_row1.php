@@ -17,11 +17,11 @@ switch ($key){
         break ;
 
     case 'dealerCompanies':
-        $url='dealer/company';$panelClass='panel-red';$text='My Companies';
+        $url='dealer/companies';$panelClass='panel-red';$text='My Companies';
         break ;
 
     case 'dealerAuctions':
-        $url=false;$panelClass='panel-green';$text='My Auctions';
+        $url='dealer/auctions';$panelClass='panel-green';$text='My Auctions';
         break;
 
     default:

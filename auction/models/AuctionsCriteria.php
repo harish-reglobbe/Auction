@@ -2,8 +2,7 @@
 
 namespace auction\models;
 
-use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
+use auction\models\core\ActiveRecord;
 
 /**
  * This is the model class for table "{{%auctions_criteria}}".
@@ -18,20 +17,8 @@ use yii\db\Expression;
  *
  * @property Auctions $auction0
  */
-class AuctionsCriteria extends \yii\db\ActiveRecord
+class AuctionsCriteria extends ActiveRecord
 {
-
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'create_date',
-                'updatedAtAttribute' => 'update_date',
-                'value' => new Expression('NOW()'),
-            ],
-        ];
-    }
     /**
      * @inheritdoc
      */

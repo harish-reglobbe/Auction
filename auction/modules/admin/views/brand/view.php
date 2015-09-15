@@ -49,7 +49,7 @@ use auction\components\helpers\DatabaseHelper;
                         <div id="collapseTwo" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <address>
-                                    <?= Html::img(Auction::$app->request->baseUrl.'/uploads/brands/'.$model->image) ?>
+                                    <?= Auction::showImage('brand' , $model->image) ?>
                                 </address>
                             </div>
 

@@ -2,7 +2,10 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
+use auction\models\core\ActiveRecord;
 use Yii;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "{{%lots}}".
@@ -18,11 +21,15 @@ use Yii;
  * @property Auctions $auction0
  * @property Products[] $products
  */
-class Lots extends \yii\db\ActiveRecord
+class Lots extends ActiveRecord
 {
     /**
      * @inheritdoc
      */
+
+    public function behaviors(){
+        return [];
+    }
     public static function tableName()
     {
         return '{{%lots}}';
@@ -34,8 +41,8 @@ class Lots extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'auction', 'condition'], 'required'],
-            [['auction', 'lot_size', 'is_quantity'], 'integer'],
+            [['name', 'auction', 'condition','lot_size', 'is_quantity'], 'required'],
+            [['id','auction', 'lot_size', 'is_quantity'], 'integer'],
             [['name', 'condition'], 'string', 'max' => 255]
         ];
     }
@@ -51,7 +58,7 @@ class Lots extends \yii\db\ActiveRecord
             'auction' => 'Auction',
             'condition' => 'Condition',
             'lot_size' => 'Lot Size',
-            'is_quantity' => '0=:in amount,1=:in quantity',
+            'is_quantity' => 'Quantity',
         ];
     }
 
@@ -60,7 +67,7 @@ class Lots extends \yii\db\ActiveRecord
      */
     public function getLotPreferences()
     {
-        return $this->hasMany(LotPreference::className(), ['lots' => 'id']);
+        return $this->hasOne(LotPreference::className(), ['lots' => 'id']);
     }
 
     /**
@@ -77,5 +84,32 @@ class Lots extends \yii\db\ActiveRecord
     public function getProducts()
     {
         return $this->hasMany(Products::className(), ['lot' => 'id']);
+    }
+
+    public function saveLot($request){
+        $this->load($request);
+
+        $transaction = Auction::$app->db->beginTransaction();
+        try{
+            if(!$this->save())
+                return false;
+
+            $preferences= new LotPreference();
+            $preferences->load($request);
+
+            $preferences->lots = $this->primaryKey;
+            if($preferences->save()){
+                $transaction->commit();
+                return true;
+            }
+
+            return false;
+
+        }catch(Exception $ex){
+            Auction::error('Lot Not Saved Due to following Errors'.$ex->getMessage());
+            $transaction->rollBack();
+            return false;
+        }
+
     }
 }

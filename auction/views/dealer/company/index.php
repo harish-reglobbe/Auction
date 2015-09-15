@@ -1,7 +1,6 @@
 <?php
 
 use yii\widgets\ListView;
-use yii\widgets\Pjax;
 use yii\helpers\Html;
 use yii\web\JsExpression;
 use auction\components\Auction;
@@ -37,7 +36,7 @@ $this->title = 'Dealer :: Company';
                 if(id == ""){
                     return false;
                 }else{
-                    window.location.href = "'. Auction::createUrl('dealer/company/view') .'&id="+id;
+                    window.location.href = "'. Auction::createUrl('dealer/company/view') .'?id="+id;
                 }
                 ')
             ]) ?>
@@ -47,7 +46,6 @@ $this->title = 'Dealer :: Company';
 </div>
 
 <div class="row">
-    <?php Pjax::begin(['id' => 'pjax-gridview', 'timeout' => false, 'enablePushState' => false]) ?>
     <?= ListView::widget([
         'dataProvider' => $dataProvider,
         'itemView' => '_info_panel',
@@ -55,7 +53,6 @@ $this->title = 'Dealer :: Company';
         'summary' => false
     ])
     ?>
-    <?php Pjax::end() ?>
 </div>
 
 

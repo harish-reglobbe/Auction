@@ -2,6 +2,7 @@
 
 namespace auction\models\forms;
 
+use auction\components\Auction;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -89,7 +90,7 @@ class SearchAuction extends Auctions
         $dataProvider= $this->search($params);
 
         $dataProvider->query->andWhere([
-            'companies.id' => 2
+            'companies.id' => Auction::company()
         ]);
 
         return $dataProvider;

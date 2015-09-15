@@ -53,7 +53,6 @@ class UserController extends Controller
     public function actionView()
     {
         $id=Auction::$app->request->post('id');
-
         if($id){
             return $this->renderAjax('view', [
                 'model' => $this->findModel($id),
@@ -70,7 +69,6 @@ class UserController extends Controller
     public function actionCreate()
     {
         $model = new Users();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -105,27 +103,6 @@ class UserController extends Controller
     }
 
     /**
-     * Deletes an existing Users model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete()
-    {
-        $id=Auction::$app->request->post('id');
-
-        if($id){
-            $model=$this->findModel($id);
-            $model->is_active=DatabaseHelper::IN_ACTIVE;
-
-            if(!$model->save()){
-                dump($model->getErrors());
-            }
-        }
-
-    }
-
-    /**
      * Finds the Users model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -135,10 +112,7 @@ class UserController extends Controller
     protected function findModel($id)
     {
         $model = Users::find()
-            ->joinWith([
-                'dealers',
-                'company'
-            ])
+            ->joinWith(['dealers', 'company'])
             ->where([
                 'users.id' => $id
             ])

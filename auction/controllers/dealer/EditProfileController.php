@@ -3,23 +3,21 @@
 namespace auction\controllers\dealer;
 
 use auction\components\Auction;
-use auction\components\controllers\DealerController;
-use auction\components\helpers\AccessRule;
-use auction\models\DealerCompanyPreferences;
+use auction\components\controllers\Controller;
+use auction\components\helpers\DatabaseHelper;
 use auction\models\DealerPreference;
 use auction\models\Dealers;
-use yii\filters\AccessControl;
 use yii\helpers\Json;
-use yii\web\Controller;
 use yii\web\HttpException;
 
 class EditProfileController extends Controller
 {
+    public $roles = [DatabaseHelper::DEALER];
+    public $roleBaseActions =  ['index' , 'add-preference' ,'delete-preference'];
 
     public function actionIndex()
     {
         $model = $this->loadProfile();
-
         if(Auction::$app->request->isPost){
             $post = Auction::$app->request->post();
             $model->load($post);
@@ -27,7 +25,6 @@ class EditProfileController extends Controller
 
             $model->update();
         }
-
         return $this->render('index',[
             'model' => $model
         ]);
@@ -59,16 +56,9 @@ class EditProfileController extends Controller
         $post = Auction::$app->request->post();
 
         if($post){
-            $model = new DealerPreference();
-            $model->brand = $post['brand'];
-            $model->category = $post['category'];
-            $model->dealer = Auction::dealer();
-
-            if($model->save()){
-                return $this->actionIndex();
-            }else {
-                throw new HttpException(400, 'Already Exist');
-            }
+           if(DealerPreference::model()->addPreference($post)){
+               return $this->actionIndex();
+           }
         }
     }
 

@@ -4,7 +4,6 @@ namespace auction\modules\admin\controllers;
 
 use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
-use Yii;
 use auction\models\Categories;
 use auction\models\forms\SearchCategory;
 use yii\web\Controller;
@@ -22,7 +21,6 @@ class CategoryController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post'],
                     'view' => ['post'],
                     'update' => ['post'],
                     'create' => ['post']
@@ -38,7 +36,7 @@ class CategoryController extends Controller
     public function actionIndex()
     {
         $searchModel = new SearchCategory();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Auction::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -54,7 +52,6 @@ class CategoryController extends Controller
     public function actionView()
     {
         $id=Auction::$app->request->post('id');
-
         if($id) {
             return $this->renderPartial('view', [
                 'model' => $this->findModel($id),
@@ -70,9 +67,7 @@ class CategoryController extends Controller
     public function actionCreate()
     {
         $model = new Categories();
-        $model->scenario='create';
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Auction::$app->request->post()) && $model->save()) {
             return 'Success';
         } else {
             return $this->renderPartial('_form', [
@@ -90,39 +85,16 @@ class CategoryController extends Controller
     public function actionUpdate()
     {
         $id=Auction::$app->request->post('id');
-
         if($id){
             $model = $this->findModel($id);
-
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($model->load(Auction::$app->request->post()) && $model->save()) {
                 return 'Successfully Updated';
             } else {
                 return $this->renderPartial('_form', [
                     'model' => $model,
                 ]);
             }
-
         }
-    }
-
-    /**
-     * Deletes an existing Categories model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete()
-    {
-        $id=Auction::$app->request->post('id');
-
-        if($id){
-
-            $model=$this->findModel($id);
-            $model->is_active=DatabaseHelper::IN_ACTIVE;
-            $model->save();
-
-        }
-
     }
 
     /**

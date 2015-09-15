@@ -19,7 +19,7 @@ class ResetPasswordController extends \yii\web\Controller
                 Auction::$app->getSession()->setFlash('error', 'Sorry, we are unable to reset password for email/mobile provided.May be Provided Email/mobile not exist');
             }
 
-            return $this->refresh();
+//            return $this->refresh();
         }
 
         return $this->render('//site/reset-password',['model' => $model]);

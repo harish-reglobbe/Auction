@@ -4,12 +4,12 @@ namespace auction\controllers\site;
 
 use auction\components\Auction;
 use auction\components\helpers\DatabaseHelper;
+use yii\web\Controller;
 
-class IndexController extends \yii\web\Controller
+class IndexController extends Controller
 {
     public function actionIndex()
     {
-
         if(Auction::$app->user->isGuest){
             Auction::warning('Guest User :: Redirecting to Login Page');
             $this->redirect(Auction::$app->urlManager->createAbsoluteUrl('site/login'));
@@ -42,5 +42,4 @@ class IndexController extends \yii\web\Controller
             }
         }
     }
-
 }

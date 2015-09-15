@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\ArrayHelper;
 use auction\components\helpers\DatabaseHelper;
+use auction\components\Auction;
 
 /* @var $this yii\web\View */
 /* @var $model auction\models\Users */
@@ -27,7 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'is_active',
                 'value' => DatabaseHelper::GetStatus($model->is_active)
             ],
-            'profile_pic',
             'created_at:date',
         ],
     ]) ?>
@@ -37,10 +37,20 @@ $this->params['breadcrumbs'][] = $this->title;
     $common_attribute=['name','address'];
     if($model->dealers !== null){
         $attributes=['contact','city'];
+        $attributes[] =[
+            'label' => 'Profile Pic',
+            'format' => 'html',
+            'value' => Auction::showImage('dealer' , $model->profile_pic)
+        ];
         $detailView=$model->dealers;
     }
     elseif($model->company !== null){
         $attributes=['domain','contact','description'];
+        $attributes[] =[
+            'label' => 'Profile Picture',
+            'format' => 'html',
+            'value' => Auction::showImage('company' , $model->company->logo_image)
+        ];
         $detailView=$model->company;
     }
 

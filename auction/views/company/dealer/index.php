@@ -35,7 +35,12 @@ Modal::begin([
             'class' => 'btn btn-primary btn-modal-save',
             'id' => 'delete-role-model',
             'data-id' => '',
-            'onClick' => new JsExpression('var id=$("#delete-role-model").attr("data-id");$.ajax({type:"post",url:"'.Url::to(['delete']).'",data:{id:id},success:function(){$.pjax.reload({container:"#pjax-gridview",timeout:2e3}),$("#activity-delete-modal").modal("hide")}});')
+            'onClick' => new JsExpression('
+                        var id=$("#delete-role-model").attr("data-id");
+                        $.ajax({type:"post",url:"'.Url::to(['deactivate']).'",data:{id:id},success:function(){
+                        $.pjax.reload({container:"#pjax-gridview",timeout:2e3}),
+                        $("#activity-delete-modal").modal("hide")}});
+                        ')
         ]),
 ]);
 
@@ -44,7 +49,11 @@ Modal::end();
 ?>
 
 <?php $this->registerJs('
-jQuery(document).on("click",".deactivate-dealer",function(){var t=$(this).attr("data-id");$("#delete-role-model").attr("data-id",t),$("#activity-delete-modal").modal("show")})
+jQuery(document).on("click",".deactivate-dealer",function(){
+    var t=$(this).attr("data-id");
+    $("#delete-role-model").attr("data-id",t),
+    $("#activity-delete-modal").modal("show")
+})
 jQuery(document).on("click",".activate-dealer",function(){
         var t=$(this).attr("data-id");
         $.ajax({
@@ -52,7 +61,6 @@ jQuery(document).on("click",".activate-dealer",function(){
         data:{id:t},
         success:function(data){
             $.pjax.reload({container:"#pjax-gridview",timeout:2e3});
-            alert("Activated");
         }
         });
         return false;

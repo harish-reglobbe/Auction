@@ -3,10 +3,11 @@
 namespace auction\models;
 
 use auction\components\Auction;
-use Yii;
+use auction\models\core\ActiveRecord;
+use auction\models\core\Expression;
+use auction\models\core\TimestampBehaviour;
 use common\models\User;
-use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
+use Yii;
 use auction\components\helpers\DatabaseHelper;
 use auction\components\Events;
 use auction\components\EventHandler;
@@ -44,23 +45,22 @@ class Users extends User
         return '{{%users}}';
     }
 
-
-    public function init(){
-        //User Login Event handler
-        $this->on(Events::USER_LOGIN, [EventHandler::className(), 'UserLogin']);
-    }
-
-
     public function behaviors()
     {
         return [
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehaviour::className(),
                 'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('NOW()'),
             ],
         ];
+    }
+
+
+    public function init(){
+        //User Login Event handler
+        $this->on(Events::USER_LOGIN, [EventHandler::className(), 'UserLogin']);
     }
 
     /**
@@ -73,9 +73,9 @@ class Users extends User
             [['last_login', 'created_at', 'updated_at'], 'safe'],
             [['is_active'], 'integer'],
             [['name', 'email', 'mobile', 'password', 'profile_pic', 'auth_key'], 'string', 'max' => 255],
-            [['last_login_ip'], 'string', 'max' => 15],
             [['user_role'], 'string', 'max' => 25],
-            ['email' ,'email']
+            ['email' ,'email'],
+            [['email' , 'mobile'] , 'unique']
         ];
     }
 
@@ -197,19 +197,6 @@ class Users extends User
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id, 'is_active' => DatabaseHelper::ACTIVE]);
-    }
-
-    /**  Last Reset Password token of user */
-    public function Token($via){
-        if($via == 'email'){
-            $config['class'] = ForgotPasswordHistory::className();
-        }
-        else{
-            $config['class'] = OptHistory::className();
-        }
-
-        $config['userObject'] = $this;
-        return Auction::createObject($config);
     }
 
     public function SaveCompanyUser(){

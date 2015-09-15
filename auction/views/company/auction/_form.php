@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use auction\components\helpers\DatabaseHelper;
 use dosamigos\datepicker\DatePicker;
-use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model auction\models\Auctions */
@@ -18,8 +17,6 @@ use yii\helpers\ArrayHelper;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'start_date')->widget(DatePicker::className(),[
-        'model' => $searchModel,
-        'attribute' => 'created_at',
         'template' => '{addon}{input}',
         'clientOptions' => [
             'autoclose' => true,
@@ -51,9 +48,9 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'max_extd')->textInput() ?>
 
-    <?= $form->field($model, 'category')->dropDownList(ArrayHelper::map(\auction\models\Categories::find()->asArray()->all(),'id' , 'name')) ?>
+    <?= $form->field($model, 'category')->dropDownList(\auction\components\Auction::dropDownList('auction\models\Categories' , 'id' ,'name')) ?>
 
-    <?= $form->field($model, 'brand')->dropDownList(ArrayHelper::map(\auction\models\Brands::find()->asArray()->all(),'id' , 'name')) ?>
+    <?= $form->field($model, 'brand')->dropDownList(\auction\components\Auction::dropDownList('auction\models\Brands' ,'id' , 'name')) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Create' , ['class' => 'btn btn-success']) ?>

@@ -3,20 +3,27 @@
 namespace auction\controllers\company;
 
 use auction\components\Auction;
+use auction\components\controllers\Controller;
+use auction\components\helpers\DatabaseHelper;
 use Yii;
 use auction\models\Users;
 use auction\models\forms\SearchUser;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\AccessControl;
-use auction\components\helpers\AccessRule;
-use auction\components\helpers\DatabaseHelper;
 
 /**
  * UserController implements the CRUD actions for Users model.
  */
 class UserController extends Controller
 {
+    public $roles = [DatabaseHelper::COMPANY_ADMIN];
+    public $roleBaseActions = ['index','create','view','update','delete'];
+
+    public $verbs = [
+        'delete' => ['post'],
+        'update' => ['post'],
+        'create' => ['post'],
+        'view' => ['post']
+    ];
 
     /**
      * Lists all Users models.

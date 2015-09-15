@@ -8,17 +8,14 @@
 
 namespace auction\components\controllers;
 
-
 use auction\components\helpers\AccessRule;
-use auction\components\helpers\DatabaseHelper;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 
-class DealerController extends Controller
+class Controller extends \yii\web\Controller
 {
     //Roles Defined
-    public $roles = [DatabaseHelper::DEALER];
+    public $roles = [];
     public $roleBaseActions = ['index'];
 
     public $verbs = [

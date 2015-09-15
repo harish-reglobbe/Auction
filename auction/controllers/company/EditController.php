@@ -10,7 +10,6 @@ namespace auction\controllers\company;
 
 
 use auction\components\Auction;
-use auction\models\Companies;
 use auction\models\forms\CompanyRegistration;
 use auction\models\Users;
 use yii\helpers\ArrayHelper;
@@ -21,34 +20,35 @@ class EditController extends Controller{
 
     public function actionIndex(){
 
-        $model = $this->loadProfile();
+        $model= new CompanyRegistration();
 
         if(Auction::$app->request->isPost){
-            $post = Auction::$app->request->post();
-            $model->load($post);
-            $model->user->load($post);
 
-            $model->update();
+            $model->load(Auction::$app->request->post());
+            $model->SaveCompany();
+
+        }
+        else {
+
+            $modelAttributes = ArrayHelper::merge($this->loadModel()->getAttributes(), $this->loadModel()->company->attributes);
+            $model->setAttributes($modelAttributes);
+
         }
 
-        return $this->render('//company/edit',[
-            'model' => $model
-        ]);
+        return $this->render('//company/edit',['model' => $model]);
 
     }
 
-    protected function loadProfile(){
-        $model = Companies::find()->innerJoinWith([
-            'user' => function($query){
-                $query->where(['users.id' => Auction::user()]);
-            }
+    protected function loadModel(){
+
+        $model = Users::find()->joinWith([
+            'company'
         ])->where([
-            'companies.id' => Auction::company(),
+            'users.id' => Auction::$app->user->id
         ])->one();
 
         if($model === null){
-            Auction::error('No Valid Dealer Found with userid '.Auction::$app->user->id);
-            throw new HttpException(404, 'No user found');
+            throw new HttpException(400 , 'Not A Valid Company Admin');
         }
 
         return $model;

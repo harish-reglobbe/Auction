@@ -16,21 +16,24 @@ use yii\widgets\ListView;
 use yii\helpers\Html;
 use auction\components\Auction;
 
+$preferenceData = ($model->dealerCompanies) ? $model->dealerCompanies[0] : null;
+
 $this->title = 'Company :: Info';
 ?>
 
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">Company: <?= $model->name ?>
-        <span>
-            <img src="<?= Yii::$app->request->baseUrl.'/uploads/dealers/thumbs/Harish(3)1441456035.jpg'?>" style="float: right">
+            <span>
+            <img src="<?= Auction::showImage('company' ,$model->logo_image) ?>"
+                 style="float: right">
         </span>
         </h1>
     </div>
     <!-- /.col-lg-12 -->
 </div>
 <!-- /.row -->
-<?php Pjax::begin(['id' => 'toggle-status',  'enablePushState' => false , 'clientOptions' => ['async' => false]])?>
+<?php Pjax::begin(['id' => 'toggle-status', 'enablePushState' => false, 'clientOptions' => ['async' => false]]) ?>
 <div class="row">
     <div class="col-lg-8">
         <div class="chat-panel panel panel-green">
@@ -47,12 +50,12 @@ $this->title = 'Company :: Info';
                     'summary' => false,
                     'emptyText' => '<address>No Auction Found for this Company</address>',
                     'itemView' => '_latest_auctions'
-                ])?>
+                ]) ?>
             </div>
-            <div class="panel-footer" >
-                <?= Html::a(($model->dealerCompanies) ? ($model->dealerCompanies[0]->status) ? 'Unsubscribe' : 'Subscribe' : 'Subscribe',
+            <div class="panel-footer">
+                <?= Html::a(($preferenceData) ? ($preferenceData->status) ? 'Unsubscribe' : 'Subscribe' : 'Subscribe',
                     \yii\helpers\Url::to(['toggle-status', 'id' => $model->id])
-                    ) ?>
+                ) ?>
             </div>
             <!-- /.panel-body -->
         </div>
@@ -95,9 +98,9 @@ $this->title = 'Company :: Info';
                     <!-- /.panel-body -->
                 </div>
                 <!-- /.panel Address-->
-                <?= BootstrapHelper::PanelInfo('Company Address','<address>'. $model->address .'</address>',false,['class' => 'panel panel-info'])?>
+                <?= BootstrapHelper::PanelInfo('Company Address', '<address>' . $model->address . '</address>', false, ['class' => 'panel panel-info']) ?>
                 <!-- /.panel Description-->
-                <?= BootstrapHelper::PanelInfo('Company Description','<address>'. $model->description .'</address>',false,['class' => 'panel panel-info'])?>
+                <?= BootstrapHelper::PanelInfo('Company Description', '<address>' . $model->description . '</address>', false, ['class' => 'panel panel-info']) ?>
             </div>
             <!-- /.panel .chat-panel -->
         </div>
@@ -106,7 +109,7 @@ $this->title = 'Company :: Info';
     <!-- /.row -->
 </div>
 <!-- /.row -->
-<?php $companyModel= $model->dealerCompanies[0];if($companyModel && $companyModel->is_active): ?>
+<?php if ($preferenceData && $preferenceData->is_active && $preferenceData->status): ?>
     <div class="row">
         <div class="col-md-6 "><!--Add col-md-offset-3 to make it in center-->
             <div class="login-panel panel panel-info" style="margin-top: 20px">
@@ -114,23 +117,20 @@ $this->title = 'Company :: Info';
                     <h3 class="panel-title">Add Preferences</h3>
                 </div>
                 <div class="panel-body">
-                    <?php Pjax::begin(['id' => 'create-preferences',  'enablePushState' => false]) ?>
+                    <?php Pjax::begin(['id' => 'create-preferences', 'enablePushState' => false , 'clientOptions' => ['async' => false]]) ?>
                     <?php $form = ActiveForm::begin([
                         'id' => 'update-preferences',
                         'action' => \yii\helpers\Url::to(['add-preference']),
                         'fieldClass' => 'auction\widgets\ActiveField',
                         'successCssClass' => false,
-                        'options'=> ['role' => 'form' , 'data-pjax' => true]]); ?>
+                        'options' => ['role' => 'form', 'data-pjax' => true]]); ?>
                     <fieldset>
                         <div class="form-group input-group">
 
-                            <?= Html::hiddenInput('dc_id' , $companyModel->id)?>
-
-                            <?= Html::hiddenInput('id' , $model->id)?>
-
-                            <?= Html::dropDownList('category','',Auction::dropDownList('auction\models\Categories','id','name'),[]) ?>
-
-                            <?= Html::dropDownList('brand','',Auction::dropDownList('auction\models\Brands','id','name'),[]) ?>
+                            <?= Html::hiddenInput('dc_id', $preferenceData->id) ?>
+                            <?= Html::hiddenInput('id', $model->id) ?>
+                            <?= Html::dropDownList('category', '', Auction::dropDownList('auction\models\Categories', 'id', 'name'), []) ?>
+                            <?= Html::dropDownList('brand', '', Auction::dropDownList('auction\models\Brands', 'id', 'name'), []) ?>
 
                             <span class="input-group-btn">
                         <button class="btn btn-default" type="submit">
@@ -139,16 +139,15 @@ $this->title = 'Company :: Info';
                     </span>
                         </div>
 
-                        <?php if($companyModel->dealerCompanyPreferences) :?>
-                            <?php foreach($companyModel->dealerCompanyPreferences as $param):?>
+                        <?php if ($preferenceData->dealerCompanyPreferences) : ?>
+                            <?php foreach ($preferenceData->dealerCompanyPreferences as $param): ?>
                                 <div class="form-group input-group">
 
-                                    <?= $form->field($param->category0 , 'name')->textInput(['class' => 'form-control' ,'disabled' => 'disabled'])?>
-
-                                    <?= $form->field($param->brand0 , 'name')->textInput(['class' => 'form-control' ,'disabled' => 'disabled'])?>
+                                    <?= $form->field($param->category0, 'name')->textInput(['class' => 'form-control', 'disabled' => 'disabled']) ?>
+                                    <?= $form->field($param->brand0, 'name')->textInput(['class' => 'form-control', 'disabled' => 'disabled']) ?>
 
                                     <span class="input-group-btn">
-                                    <?= Html::button('<i class="fa fa-minus"></i>',['class' => 'btn btn-default delete-button' ,'id' => $param->primaryKey])?>
+                                    <?= Html::button('<i class="fa fa-minus"></i>', ['class' => 'btn btn-default delete-button', 'id' => $param->primaryKey]) ?>
                                      </span>
                                 </div>
 
@@ -163,9 +162,22 @@ $this->title = 'Company :: Info';
         </div>
         <!--    Col -md -6-->
     </div>
-<?php endif;?>
-<?php Pjax::end()?>
-
-<!-- /.row -->
-
+<?php endif; ?>
+<?php Pjax::end() ?>
+<?php
+$this->registerJs('
+jQuery(document).on("click" , ".delete-button" ,function(){
+    var id = $(this).attr("id");
+    $.ajax({
+    type: "post",
+    url : "'. \yii\helpers\Url::to(['delete-preference']) .'",
+    data: {id : id},
+    success : function(t){
+        $.pjax.reload({container:"#create-preferences",timeout:2e3});
+    }
+    });
+});
+jQuery(document).on("pjax:error", "#create-preferences",  function(event){alert ("Already Added");});
+');
+?>
 

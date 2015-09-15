@@ -13,6 +13,7 @@ use auction\models\AuctionEmails;
 use auction\models\MessageTemplate;
 use auction\models\OptHistory;
 use yii\base\Component;
+use yii\base\Exception;
 use yii\helpers\FileHelper;
 use yii\imagine\Image;
 use yii\web\HttpException;
@@ -27,7 +28,6 @@ class EventHandler extends Component{
     public static function Registration($event){
 
         $event->sender->last_login_ip=Auction::$app->request->userIP;
-        $event->sender->last_login=Auction::$app->formatter->asDatetime(strtotime('NOW'),'php:Y:m:d h-i-s');
 
     }
 
@@ -89,7 +89,7 @@ class EventHandler extends Component{
         Auction::$app->db->createCommand()->update($event->sender->tableName(),[
             'status' => DatabaseHelper::IN_ACTIVE
         ],'user=:user and status=:status',[
-            ':user' => $event->sender->userObject->id,
+            ':user' => $event->sender->user,
             ':status' => DatabaseHelper::ACTIVE
         ])->execute();
     }
@@ -126,6 +126,43 @@ class EventHandler extends Component{
         }else {
             $_message = Auction::loggerMessageFormat('User reset token template invalid ',$_model->getErrors());
             Auction::error($_message);
+        }
+    }
+
+    /** Update Auction */
+    public static function UpdateAuction($event){
+        $sender = $event->sender;
+
+        $data = $event->data;
+
+        if($sender->load($data) && $sender->bidsTerms->load($data) && $sender->auctionsCriterias->load($data) && $sender->auctionPreferences->load($data)){
+
+            $transaction = \Yii::$app->db->transaction;
+            try{
+
+                $sender->save();
+
+                /*if($sender->bidsTerms->update() === false){
+                    return false;
+                }
+                if($sender->auctionsCriterias->update() === false){
+                    return false;
+                }
+                if($sender->auctionPreferences->update() === false){
+                    return false;
+                }*/
+
+                $transaction->commit();
+                return true;
+
+            }catch (Exception $ex){
+                print_r($ex->getMessage());die;
+
+                //$transaction->rollBack();
+                Auction::errorLog('Auction Update Error'. $ex->getMessage(), $data);
+                throw new HttpException(500 ,'Internal Sever Error');
+            }
+
         }
     }
 }

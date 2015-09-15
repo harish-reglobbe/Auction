@@ -26,4 +26,6 @@ class Events extends Event{
 
     const SEND_RESET_TOKEN = 'send-reset-token';
 
+    const UPDATE_AUCTION = 'update_auction';
+
 }

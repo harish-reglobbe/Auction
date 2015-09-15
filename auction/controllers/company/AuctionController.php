@@ -2,10 +2,17 @@
 
 namespace auction\controllers\company;
 
+use auction\components\Auction;
+use auction\components\EventHandler;
+use auction\components\Events;
+use auction\components\helpers\DatabaseHelper;
+use auction\models\Lots;
 use Yii;
 use auction\models\Auctions;
 use auction\models\forms\SearchAuction;
-use yii\web\Controller;
+use yii\base\Event;
+use yii\base\Exception;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use auction\models\forms\CreateAuction;
@@ -13,19 +20,18 @@ use auction\models\forms\CreateAuction;
 /**
  * AuctionController implements the CRUD actions for Auctions model.
  */
-class AuctionController extends Controller
+class AuctionController extends \auction\components\controllers\Controller
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
+    public $roles = [DatabaseHelper::COMPANY_ADMIN , DatabaseHelper::COMPANY_USER];
+    public $roleBaseActions = ['index' , 'view' ,'create' , 'delete' ,'update'];
+
+    public $verbs = [
+        'view' => ['get'],
+        'index' => ['get'],
+        'deactivate' => ['post'],
+        'activate' => ['post'],
+        'update' => ['get', 'post']
+    ];
 
     /**
      * Lists all Auctions models.
@@ -33,7 +39,6 @@ class AuctionController extends Controller
      */
     public function actionIndex()
     {
-
         $searchModel = new SearchAuction();
         $dataProvider = $searchModel->companyAuction(Yii::$app->request->queryParams);
 
@@ -50,8 +55,24 @@ class AuctionController extends Controller
      */
     public function actionView($id)
     {
+        $model = Auctions::find()->joinWith([
+            'bidsTerms',
+            'auctionsCriterias',
+            'company0',
+            'auctionPreferences' => function($query){
+                $query->joinWith(['category0','brand0']);
+            }
+        ])->where([
+            'auctions.id' => $id ,
+            'auctions.company' => Auction::company()]
+        )->one();
+
+        if($model == null){
+            throw new HttpException(404 , 'Not Found');
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -64,8 +85,9 @@ class AuctionController extends Controller
     {
         $model = new CreateAuction();
 
-        if ($model->load(Yii::$app->request->post())) {
-            return $this->redirect(['view', 'id' => $model->save()]);
+        if ($model->load(Auction::$app->request->post())) {
+            $id= $model->save();
+            return $this->redirect(['view', 'id' => $id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -78,13 +100,31 @@ class AuctionController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     *
+     * @throws Exception 404 if invalid data provided
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = Auctions::find()->joinWith([
+            'bidsTerms',
+            'auctionsCriterias',
+            'auctionPreferences'
+        ])->where([
+            'auctions.id' => $id
+        ])->one();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if($model === null){
+            throw new HttpException(404 ,' Not A valid Auction');
+        }
+
+        $post = Auction::post();
+
+        if ($model->load($post) && $model->bidsTerms->load($post) && $model->auctionsCriterias->load($post) && $model->auctionPreferences->load($post)) {
+
+            if($model->save() && $model->bidsTerms->save() && $model->auctionsCriterias->save() && $model->auctionPreferences->save()){
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -100,9 +140,13 @@ class AuctionController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = Auctions::findOne($id);
+        $model->status = DatabaseHelper::IN_ACTIVE;
 
-        return $this->redirect(['index']);
+        if($model->save()){
+            return $this->redirect(['index']);
+        }
+
     }
 
     /**

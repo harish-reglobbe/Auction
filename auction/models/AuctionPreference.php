@@ -2,6 +2,7 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
 
 /**
@@ -15,8 +16,11 @@ use Yii;
  * @property Categories $category0
  * @property Brands $brand0
  */
-class AuctionPreference extends \yii\db\ActiveRecord
+class AuctionPreference extends ActiveRecord
 {
+    public function behaviors(){
+        return [];
+    }
     /**
      * @inheritdoc
      */

@@ -2,6 +2,7 @@
 
 namespace auction\models;
 
+use auction\models\core\ActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
@@ -22,7 +23,7 @@ use yii\db\Expression;
  * @property LotPreference[] $lotPreferences
  * @property Products[] $products
  */
-class Categories extends \yii\db\ActiveRecord
+class Categories extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -30,18 +31,6 @@ class Categories extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return '{{%categories}}';
-    }
-
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'create_date',
-                'updatedAtAttribute' => 'update_date',
-                'value' => new Expression('NOW()'),
-            ],
-        ];
     }
 
     /**
@@ -54,7 +43,7 @@ class Categories extends \yii\db\ActiveRecord
             [['description'], 'safe'],
             [['is_active'], 'integer'],
             [['name'], 'string', 'max' => 255, 'min' => 3],
-            ['name','unique' ,'on' => 'create']
+            ['name','unique' ]
         ];
     }
 

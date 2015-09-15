@@ -2,9 +2,13 @@
 
 namespace auction\models;
 
+use auction\components\Auction;
 use auction\models\core\ActiveRecord;
-use Yii;
+use auction\models\core\Expression;
+use auction\models\core\TimestampBehaviour;
+use yii\base\Exception;
 use yii\data\ActiveDataProvider;
+use yii\web\HttpException;
 
 /**
  * This is the model class for table "{{%auctions}}".
@@ -32,6 +36,19 @@ class Auctions extends ActiveRecord
     /**
      * @inheritdoc
      */
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehaviour::className(),
+                'createdAtAttribute' => 'create_date',
+                'updatedAtAttribute' => false,
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     public static function tableName()
     {
         return '{{%auctions}}';
@@ -43,7 +60,7 @@ class Auctions extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'create_date', 'start_date', 'duration', 'company', 'status'], 'required'],
+            [['name', 'start_date', 'duration', 'company', 'status'], 'required'],
             [['create_date', 'start_date'], 'safe'],
             [['duration', 'company', 'status', 'priority'], 'integer'],
             [['amount'], 'number'],
@@ -74,7 +91,7 @@ class Auctions extends ActiveRecord
      */
     public function getAuctionPreferences()
     {
-        return $this->hasMany(AuctionPreference::className(), ['auction' => 'id']);
+        return $this->hasOne(AuctionPreference::className(), ['auction' => 'id']);
     }
 
     /**
@@ -120,15 +137,17 @@ class Auctions extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getLots()
+    public function getLots($id)
     {
-        $query =  Lots::find()->where([
-            'auction' => $this->id
-        ])->limit(3);
-
         return new ActiveDataProvider([
-            'query' => $query
+            'query' =>  Lots::find()
+                ->innerJoinWith([
+                    'lotPreferences' => function($query){
+                        $query->joinWith(['category0' , 'brand0'])->asArray();
+                    },
+                ])->where(['lots.auction' => $id])
         ]);
+
     }
 
     /**
@@ -145,5 +164,17 @@ class Auctions extends ActiveRecord
         return new ActiveDataProvider([
             'query' => $query
         ]);
+    }
+
+    public function updateAuction($request){
+        $transaction = Auction::$app->db->beginTransaction();
+        try{
+
+
+        }catch (Exception $ex){
+            $transaction->commit();
+            Auction::errorLog('Auction Not Updated '.$ex->getMessage(),$request);
+            throw new HttpException(500 , 'DataBase Error');
+        }
     }
 }

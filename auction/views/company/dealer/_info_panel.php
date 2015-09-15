@@ -6,12 +6,14 @@
  * Time: 11:09 AM
  */
 use yii\widgets\DetailView;
+use yii\helpers\Html;
+use yii\helpers\Url;
 ?>
 
 <div class="col-lg-4">
     <div class="<?php echo $model->is_active ? 'panel panel-success' : 'panel panel-danger'?>">
         <div class="panel-heading">
-            <?= $model->dealer0->name?>
+            <?= Html::a($model->dealer0->name , Url::to(['view' , 'id' => $model->dealer]))?>
         </div>
         <div class="panel-body">
             <div class="list-group">

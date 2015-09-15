@@ -15,7 +15,6 @@ use auction\components\Auction;
 
 <?php $form = ActiveForm::begin([
     'id' => 'create-brand',
-    'action' => Auction::createUrl('company/lots/create'),
     'fieldClass' => 'auction\widgets\ActiveField',
     'options' => [
         'data-pjax' => 1,
@@ -24,15 +23,27 @@ use auction\components\Auction;
 
 <fieldset>
 
+    <?= Html::hiddenInput('id', $model->id);?>
+
     <?= $form->field($model, 'name')->textInput() ?>
 
-    <?= $form->field($model, 'auction')->dropDownList(ArrayHelper::map(Auctions::find()->all(),'id','name'),['class' => 'form-control']) ?>
+    <?php if($model->auction === null): ?>
+        <?= $form->field($model, 'auction')->dropDownList(ArrayHelper::map(Auctions::find()->all(),'id','name'),['class' => 'form-control']) ?>
+        <?php else:?>
+        <?= $form->field($model , 'auction')->hiddenInput() ?>
+    <?php endif;?>
 
     <?= $form->field($model, 'condition')->textInput() ?>
 
+    <?= $form->field($model, 'lot_size')->textInput() ?>
+
     <?= $form->field($model, 'is_quantity')->textInput() ?>
 
-    <?= Html::submitButton('Create a new lot',['class' => 'btn btn-lg btn-info btn-block'])?>
+    <?= $form->field($model->lotPreferences, 'brand')->dropDownList(Auction::dropDownList('auction\models\Brands' , 'id', 'name')) ?>
+
+    <?= $form->field($model->lotPreferences, 'category')->dropDownList(Auction::dropDownList('auction\models\Categories' , 'id', 'name')) ?>
+
+    <?= Html::submitButton(($model->isNewRecord) ? 'Create a new lot' : 'Update Lot',['class' => 'btn btn-lg btn-info btn-block'])?>
 
 </fieldset>
 <?php ActiveForm::end(); ?>

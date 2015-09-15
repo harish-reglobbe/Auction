@@ -35,7 +35,7 @@ $this->title = 'Auction :: Info';
             <!-- /.panel-heading -->
             <div class="panel-body"><?php //dump($model)?>
                 <?= ListView::widget([
-                    'dataProvider' => $model->getLots(),
+                    'dataProvider' => $model->getLots($model->id),
                     'summary' => false,
                     'emptyText' => '<address>No Lots Found for this Auction</address>',
                     'itemView' => '_latest_lots'

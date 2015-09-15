@@ -2,20 +2,22 @@
 
 namespace auction\controllers\dealer;
 
+use auction\components\controllers\Controller;
+use auction\components\helpers\DatabaseHelper;
 use Yii;
 use auction\models\Auctions;
 use auction\models\forms\SearchAuction;
-use auction\components\controllers\DealerController;
 use yii\web\NotFoundHttpException;
 
 /**
  * AuctionController implements the CRUD actions for Auctions model.
  */
-class AuctionController extends DealerController
+class AuctionController extends Controller
 {
     /**
      * Defining Action Which need to be Included in AccessFilter
      */
+    public $roles = [DatabaseHelper::DEALER];
     public $roleBaseActions = ['index' , 'view'];
 
     /**

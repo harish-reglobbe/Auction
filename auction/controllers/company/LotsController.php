@@ -2,44 +2,28 @@
 
 namespace auction\controllers\company;
 
+use auction\components\Auction;
+use auction\models\LotPreference;
 use Yii;
 use auction\models\Lots;
 use auction\models\forms\SearchLot;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use auction\components\helpers\DatabaseHelper;
 
 /**
  * LotsController implements the CRUD actions for Lots model.
  */
-class LotsController extends Controller
+class LotsController extends \auction\components\controllers\Controller
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
+    public $roles = [DatabaseHelper::COMPANY_ADMIN , DatabaseHelper::COMPANY_USER];
+    public $roleBaseActions = ['index' , 'view' ,'create' , 'update'];
 
-    /**
-     * Lists all Lots models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new SearchLot();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    public $verbs = [
+        'view' => ['get'],
+        'index' => ['get'],
+        'update' => ['post'],
+    ];
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
 
     /**
      * Displays a single Lots model.
@@ -62,7 +46,10 @@ class LotsController extends Controller
     {
         $model = new Lots();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $model->auction = Auction::$app->request->get('auction');
+        $model->lotPreferences = new LotPreference();
+
+        if (Lots::model()->saveLot(Yii::$app->request->post())) {
             return 'Success';
         } else {
             return $this->renderPartial('_form', [
@@ -77,16 +64,24 @@ class LotsController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+        $id = Auction::$app->request->post('id');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if($id){
+            $model = Lots::find()->joinWith(['lotPreferences'])->where('lots.id=:id',[':id' => $id])->one();
+
+            if (isset($_POST['Lots'])) {
+                $model->load(Yii::$app->request->post());
+                $model->lotPreferences->load(Yii::$app->request->post());
+
+                if($model->update())
+                    return 'Success';
+            } else {
+                return $this->renderPartial('_form', [
+                    'model' => $model,
+                ]);
+            }
         }
     }
 
